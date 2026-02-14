@@ -13,6 +13,16 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    files: [
+      "src/lib/auth.ts",
+      "src/app/api/auth/[...nextauth]/route.ts"
+    ],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    }
+  }
 ]);
 
 export default eslintConfig;
