@@ -16,7 +16,8 @@ const eslintConfig = defineConfig([
   {
     files: [
       "src/lib/auth.ts",
-      "src/app/api/auth/[...nextauth]/route.ts"
+      "src/lib/prisma.ts",
+      "src/app/api/auth/[...nextauth]/route.ts",
     ],
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
