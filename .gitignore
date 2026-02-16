@@ -35,6 +35,11 @@ yarn-error.log*
 .env
 env
 
+# dev notes
+.dev-notes.md 
+dev-notes.md 
+dev-notes 
+
 # vercel
 .vercel
 
