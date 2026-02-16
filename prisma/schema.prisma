@@ -26,7 +26,7 @@ model User {
 model Project {
   id  String @id @default(cuid())
   name  String 
-  slug  String
+  slug  String @unique
   logo  String?
   createdAt DateTime  @default(now())
 

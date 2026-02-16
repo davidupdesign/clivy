@@ -41,7 +41,7 @@ export default async function DashboardPage() {
             <p className="text-muted-foreground mb-4">
               You don&apos;t have any projects yet.
             </p>
-            <Link href="/dashbpard/new-project">
+            <Link href="/dashboard/new-project">
               <Button>Create your first project</Button>
             </Link>
           </CardContent>
