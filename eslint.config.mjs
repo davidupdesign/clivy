@@ -5,9 +5,7 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
@@ -15,15 +13,14 @@ const eslintConfig = defineConfig([
   ]),
   {
     files: [
-      "src/lib/auth.ts",
-      "src/lib/prisma.ts",
-      "src/app/api/auth/[...nextauth]/route.ts",
+      "src/**/*.ts",
+      "src/**/*.tsx",
     ],
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
-    }
-  }
+    },
+  },
 ]);
 
 export default eslintConfig;
