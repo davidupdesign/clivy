@@ -89,7 +89,7 @@ export default async function ProjectPage({
                     </span>
                   </div>
                   <CardDescription>
-                    v{evtry.version} &middot;{" "}
+                    v{entry.version} &middot;{" "}
                     {new Date(entry.createdAt).toLocaleDateString()}
                   </CardDescription>
                 </CardHeader>

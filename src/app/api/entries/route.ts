@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       body,
       version,
       status: status || "draft",
-      publushedAt: status === "published" ? new Date() : null,
+      publishedAt: status === "published" ? new Date() : null,
       projectId,
     },
   });
