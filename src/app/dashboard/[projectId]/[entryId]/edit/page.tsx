@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
+type Tag = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 export default function EditEntryPage({
   params,
 }: {
@@ -29,29 +35,72 @@ export default function EditEntryPage({
   //fetching state - when the page loads we fetch the existing entry data from the api to pre-fill the for.
   const [fetching, setFetching] = useState(true);
 
-  useEffect(() => {
-    async function fetchEntry() {
-      const response = await fetch(`/api/entries/${entryId}`);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3b82f6");
 
-      if (!response.ok) {
-        setError("Failed to load entry.");
-        setFetching(false);
-        return;
+  // fetching available tags when page loads
+
+  useEffect(() => {
+    async function fetchData() {
+      const [entryResponse, tagsResponse] = await Promise.all([
+        fetch(`/api/entries/${entryId}`),
+        fetch(`/api/tags?projectId=${projectId}`),
+      ]);
+
+      //prefilling the page with exisiting data
+      if (entryResponse.ok) {
+        const entryData = await entryResponse.json();
+        setTitle(entryData.entry.title);
+        setVersion(entryData.entry.version);
+        setBody(entryData.entry.body);
+        setStatus(entryData.entry.status);
+        setSelectedTagIds(entryData.entry.tags.map((tag: Tag) => tag.id));
+      } else {
+        setError("Failed to load entry");
       }
 
-      const data = await response.json();
+      if (tagsResponse.ok) {
+        const tagsData = await tagsResponse.json();
+        setAvailableTags(tagsData.tags);
+      }
 
-      // prefilling the form with existing values
-      setTitle(data.entry.title);
-      setVersion(data.entry.version);
-      setBody(data.entry.body);
-      setStatus(data.entry.status);
       setFetching(false);
     }
 
-    fetchEntry();
-  }, [entryId]);
-  // entryid is the dependency array. entryid doesnt change on this page, it runs once
+    fetchData();
+    // entryid is the dependency array. entryid doesnt change on this page, it runs once
+  }, [entryId, projectId]);
+
+  //toggling tag - on/off
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId],
+    );
+  };
+
+  //creating tag
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+
+    const response = await fetch("/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newTagName,
+        color: newTagColor,
+        projectId,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setAvailableTags((prev) => [...prev, data.tag]);
+      setSelectedTagIds((prev) => [...prev, data.tag.id]);
+      setNewTagName("");
+    }
+  };
 
   //submit handler - sends PATCH instead of POST
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,7 +112,13 @@ export default function EditEntryPage({
     const response = await fetch(`/api/entries/${entryId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body, version, status }),
+      body: JSON.stringify({
+        title,
+        body,
+        version,
+        status,
+        tagIds: selectedTagIds,
+      }),
     });
 
     const data = await response.json();
@@ -130,6 +185,56 @@ export default function EditEntryPage({
           </div>
         </div>
 
+        {/* tags */}
+        <div className="space-y-3">
+          <Label>Tags</Label>
+
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggleTag(tag.id)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  selectedTagIds.includes(tag.id)
+                    ? "border-transparent text-white"
+                    : "border-gray-200 bg-white"
+                }`}
+                style={
+                  selectedTagIds.includes(tag.id)
+                    ? { backgroundColor: tag.color }
+                    : { color: tag.color }
+                }
+              >
+                {tag.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder="New tag name"
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              className="w-40"
+            />
+            <input
+              type="color"
+              value={newTagColor}
+              onChange={(e) => setNewTagColor(e.target.value)}
+              className="w-8 h-8 rounded cursor-pointer"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCreateTag}
+            >
+              Add Tag
+            </Button>
+          </div>
+        </div>
+
         {/* editor and preview side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* editor */}
@@ -167,7 +272,6 @@ export default function EditEntryPage({
 
         {/* buttons */}
         <div className="flex gap-3">
-
           {/* save/draft button */}
           <Button
             type="submit"
@@ -188,11 +292,7 @@ export default function EditEntryPage({
           </Button>
 
           {/* Delete button */}
-          <Button
-          type="button"
-            variant="destructive"
-            onClick={handleDelete}
-          >
+          <Button type="button" variant="destructive" onClick={handleDelete}>
             Delete
           </Button>
         </div>

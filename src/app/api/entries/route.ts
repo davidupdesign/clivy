@@ -12,7 +12,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title, body, version, status, projectId } = await request.json();
+  const { title, body, version, status, projectId, tagIds } =
+    await request.json();
 
   if (!title || !body || !version || !projectId) {
     return NextResponse.json(
@@ -41,7 +42,11 @@ export async function POST(request: Request) {
       status: status || "draft",
       publishedAt: status === "published" ? new Date() : null,
       projectId,
+      tags: {
+        connect: (tagIds || []).map((id: string) => ({ id })),
+      },
     },
+    include: { tags: true },
   });
 
   return NextResponse.json({ entry }, { status: 201 });

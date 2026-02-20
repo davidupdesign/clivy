@@ -7,15 +7,12 @@ import { prisma } from "@/lib/prisma";
 // GET — fetch a single entry
 export async function GET(
   request: Request,
-  context: { params: Promise<{ entryId: string }> }
+  context: { params: Promise<{ entryId: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { entryId } = await context.params;
@@ -29,17 +26,11 @@ export async function GET(
   });
 
   if (!entry) {
-    return NextResponse.json(
-      { error: "Entry not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
   }
 
   if (entry.project.userId !== session.user.id) {
-    return NextResponse.json(
-      { error: "Forbidden" },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   return NextResponse.json({ entry });
@@ -48,22 +39,19 @@ export async function GET(
 // PATCH — update an existing entry
 export async function PATCH(
   request: Request,
-  context: { params: Promise<{ entryId: string }> }
+  context: { params: Promise<{ entryId: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // await params
+  // awaiting params
   const { entryId } = await context.params;
 
   // reading json body (all the fields that user changed)
-  const { title, body, version, status } = await request.json();
+  const { title, body, version, status, tagIds } = await request.json();
 
   // 1. finding the entry and verifying it belongs to the current user
   const entry = await prisma.entry.findUnique({
@@ -73,18 +61,12 @@ export async function PATCH(
 
   // entry doesnt exist
   if (!entry) {
-    return NextResponse.json(
-      { error: "Entry not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
   }
 
   // entry belongs to another user
   if (entry.project.userId !== session.user.id) {
-    return NextResponse.json(
-      { error: "Forbidden" },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   // 2. build update object
@@ -102,7 +84,15 @@ export async function PATCH(
   // 3. update entry
   const updatedEntry = await prisma.entry.update({
     where: { id: entryId },
-    data: updateData,
+    data: {
+      ...updateData,
+      ...(tagIds && {
+        tags: {
+          set: tagIds.map((id: string) => ({ id })),
+        },
+      }),
+    },
+    include: { tags: true },
   });
 
   return NextResponse.json({ entry: updatedEntry });
@@ -111,15 +101,12 @@ export async function PATCH(
 // DELETE — remove an entry permanently
 export async function DELETE(
   request: Request,
-  context: { params: Promise<{ entryId: string }> }
+  context: { params: Promise<{ entryId: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { entryId } = await context.params;
@@ -130,17 +117,11 @@ export async function DELETE(
   });
 
   if (!entry) {
-    return NextResponse.json(
-      { error: "Entry not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
   }
 
   if (entry.project.userId !== session.user.id) {
-    return NextResponse.json(
-      { error: "Forbidden" },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   await prisma.entry.delete({
