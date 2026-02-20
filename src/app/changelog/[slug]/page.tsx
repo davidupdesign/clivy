@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 
+import Reactions from "@/components/reactions";
+
 export default async function PuclicChangelogPage({
   params,
 }: {
@@ -90,6 +92,7 @@ export default async function PuclicChangelogPage({
               <div className="prose prose-sm max-w-none">
                 <ReactMarkdown>{entry.body}</ReactMarkdown>
               </div>
+              <Reactions entryId={entry.id} />
             </article>
           ))}
         </div>
