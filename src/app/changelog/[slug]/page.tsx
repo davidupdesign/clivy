@@ -6,6 +6,8 @@ import ReactMarkdown from "react-markdown";
 
 import Reactions from "@/components/reactions";
 
+import SubscribeForm from "@/components/subscribe-form";
+
 export default async function PuclicChangelogPage({
   params,
 }: {
@@ -42,6 +44,16 @@ export default async function PuclicChangelogPage({
         <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
         <p className="text-muted-foreground">Changelog</p>
       </header>
+
+      {/* subscribe section */}
+      <div className="mb-12 text-center">
+        <p className="text-sm text-muted-foreground mb-3">
+          Subscribe to get notified when we publish updates.
+        </p>
+        <div className="flex justify-center">
+          <SubscribeForm projectId={project.id} />
+        </div>
+      </div>
 
       {/* entries */}
       {project.entries.length === 0 ? (
