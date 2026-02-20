@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import Reactions from "@/components/reactions";
 
 import SubscribeForm from "@/components/subscribe-form";
+import ViewTracker from "@/components/view-tracker";
 
 export default async function PuclicChangelogPage({
   params,
@@ -39,6 +40,7 @@ export default async function PuclicChangelogPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <ViewTracker entryIds={project.entries.map((e) => e.id)} />
       {/* project header */}
       <header className="mb-12 text-center">
         <h1 className="text-4xl font-bold mb-2">{project.name}</h1>

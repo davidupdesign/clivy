@@ -33,6 +33,9 @@ export default async function ProjectPage({
         orderBy: { createdAt: "desc" },
         include: {
           tags: true,
+          _count: {
+            select: { pageViews: true },
+          },
         },
       },
     },
@@ -90,7 +93,8 @@ export default async function ProjectPage({
                   </div>
                   <CardDescription>
                     v{entry.version} &middot;{" "}
-                    {new Date(entry.createdAt).toLocaleDateString()}
+                    {new Date(entry.createdAt).toLocaleDateString()} &middot;{" "}
+                    {entry._count.pageViews} views
                   </CardDescription>
                 </CardHeader>
                 {entry.tags.length > 0 && (

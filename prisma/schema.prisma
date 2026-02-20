@@ -97,8 +97,7 @@ model Subscriber {
 
 model PageView {
   id String @id @default(cuid())
-  timestamp DateTime @default(now())
-
+  createdAt DateTime @default(now())
   entryId String
   entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 }
