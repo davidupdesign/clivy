@@ -51,7 +51,8 @@ export async function PATCH(
   const { entryId } = await context.params;
 
   // reading json body (all the fields that user changed)
-  const { title, body, version, status, tagIds } = await request.json();
+  const { title, body, version, status, tagIds, scheduledAt } =
+    await request.json();
 
   // 1. finding the entry and verifying it belongs to the current user
   const entry = await prisma.entry.findUnique({
@@ -75,9 +76,12 @@ export async function PATCH(
     ...(body && { body }),
     ...(version && { version }),
     ...(status && { status }),
-    ...(status === "published" &&
-      !entry.publishedAt && {
-        publishedAt: new Date(),
+    ...(status === "published" && {
+      publishedAt: entry.publishedAt || new Date(),
+    }),
+    ...(status === "scheduled" &&
+      scheduledAt && {
+        publishedAt: new Date(scheduledAt),
       }),
   };
 

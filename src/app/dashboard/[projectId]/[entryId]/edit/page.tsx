@@ -40,6 +40,9 @@ export default function EditEntryPage({
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState("#3b82f6");
 
+  // scheduling
+  const [scheduledAt, setScheduledAt] = useState("");
+
   // fetching available tags when page loads
 
   useEffect(() => {
@@ -56,6 +59,14 @@ export default function EditEntryPage({
         setVersion(entryData.entry.version);
         setBody(entryData.entry.body);
         setStatus(entryData.entry.status);
+        if (
+          entryData.entry.publishedAt &&
+          entryData.entry.status === "scheduled"
+        ) {
+          setScheduledAt(
+            new Date(entryData.entry.publishedAt).toISOString().slice(0, 16),
+          );
+        }
         setSelectedTagIds(entryData.entry.tags.map((tag: Tag) => tag.id));
       } else {
         setError("Failed to load entry");
@@ -118,6 +129,7 @@ export default function EditEntryPage({
         version,
         status,
         tagIds: selectedTagIds,
+        scheduledAt: status === "scheduled" ? scheduledAt : null,
       }),
     });
 
@@ -281,7 +293,7 @@ export default function EditEntryPage({
             {loading ? "Saving..." : "Save Draft"}
           </Button>
 
-          {/* Publish button */}
+          {/* publish button */}
           <Button
             type="submit"
             variant="outline"
@@ -291,7 +303,32 @@ export default function EditEntryPage({
             Publish
           </Button>
 
-          {/* Delete button */}
+          {/* scheduled button*/}
+          <div className="flex gap-2 items-end">
+            <div className="space-y-1">
+              <Label htmlFor="scheduledAt" className="text-xs">
+                Schedule for
+              </Label>
+              <Input
+                id="scheduledAt"
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                className="w-auto"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={loading || !scheduledAt}
+              onClick={() => setStatus("scheduled")}
+            >
+              Schedule
+            </Button>
+          </div>
+
+          {/* delete button */}
           <Button type="button" variant="destructive" onClick={handleDelete}>
             Delete
           </Button>

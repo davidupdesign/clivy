@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title, body, version, status, projectId, tagIds } =
+  const { title, body, version, status, projectId, tagIds, scheduledAt } =
     await request.json();
 
   if (!title || !body || !version || !projectId) {
@@ -40,7 +40,12 @@ export async function POST(request: Request) {
       body,
       version,
       status: status || "draft",
-      publishedAt: status === "published" ? new Date() : null,
+      publishedAt:
+        status === "published"
+          ? new Date()
+          : status === "scheduled"
+            ? new Date(scheduledAt)
+            : null,
       projectId,
       tags: {
         connect: (tagIds || []).map((id: string) => ({ id })),

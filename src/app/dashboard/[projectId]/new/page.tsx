@@ -35,6 +35,9 @@ export default function NewEntryPage({
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState("#3b82f6");
 
+  //sceduling
+  const [scheduledAt, setScheduledAt] = useState("");
+
   // fetching available tags when page loads
   useEffect(() => {
     async function fetchTags() {
@@ -94,6 +97,7 @@ export default function NewEntryPage({
         status,
         projectId,
         tagIds: selectedTagIds,
+        scheduledAt: status === "scheduled" ? scheduledAt : null,
       }),
     });
 
@@ -225,6 +229,7 @@ export default function NewEntryPage({
 
         {/* buttons */}
         <div className="flex gap-3">
+          {/* draft */}
           <Button
             type="submit"
             disabled={loading}
@@ -232,6 +237,7 @@ export default function NewEntryPage({
           >
             {loading ? "Saving..." : "Save as Draft"}
           </Button>
+          {/* publish */}
           <Button
             type="submit"
             variant="outline"
@@ -240,6 +246,31 @@ export default function NewEntryPage({
           >
             Publish Now
           </Button>
+
+          {/* scheduled */}
+          <div className="flex gap-2 items-end">
+            <div className="space-y-1">
+              <Label htmlFor="scheduledAt" className="text-xs">
+                Scheduled for
+              </Label>
+              <Input
+                id="scheduledAt"
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                className="w-auto"
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={loading || !scheduledAt}
+              onClick={() => setStatus("scheduled")}
+            >
+              Schedule
+            </Button>
+          </div>
         </div>
       </form>
     </div>
