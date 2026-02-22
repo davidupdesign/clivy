@@ -78,66 +78,62 @@ export default async function PuclicChangelogPage({
             <p className="text-muted-foreground text-lg">No updates yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="space-y-16">
-            {Object.entries(groupedEntries).map(([date, entries]) => (
-              <section key={date} className="space-y-8">
-                {/* Date header */}
-                <div className="flex items-center gap-4">
-                  <time className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-                    {date}
-                  </time>
-                  <div className="h-px flex-1 bg-border"></div>
+          <div className="space-y-12">
+            {project.entries.map((entry) => (
+              <article 
+                key={entry.id} 
+                className="group grid grid-cols-[160px_1fr] gap-8 items-start"
+              >
+                {/* Date on the left */}
+                <time className="text-sm font-medium text-muted-foreground pt-1 sticky top-4">
+                  {new Date(entry.publishedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+
+                {/* Entry content on the right */}
+                <div className="space-y-4">
+                  {/* Entry header */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-xl font-semibold text-pretty group-hover:text-primary transition-colors">
+                      {entry.title}
+                    </h2>
+                    
+                    {/* Version badge - more prominent */}
+                    <span className="inline-flex items-center text-xs font-bold px-3 py-1 rounded-full bg-foreground text-background">
+                      v{entry.version}
+                    </span>
+
+                    {/* Tags - more readable */}
+                    {entry.tags.length > 0 && (
+                      <>
+                        {entry.tags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="inline-flex items-center text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide"
+                            style={{
+                              backgroundColor: tag.color,
+                              color: '#ffffff',
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-sm prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                    <ReactMarkdown>{entry.body}</ReactMarkdown>
+                  </div>
+
+                  {/* Reactions */}
+                  <Reactions entryId={entry.id} />
                 </div>
-
-                {/* Entries for this date */}
-                <div className="space-y-10">
-                  {entries.map((entry) => (
-                    <article 
-                      key={entry.id} 
-                      className="group relative pl-8 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary before:ring-4 before:ring-primary/10"
-                    >
-                      {/* Entry header */}
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h2 className="text-xl font-semibold text-pretty group-hover:text-primary transition-colors">
-                          {entry.title}
-                        </h2>
-                        
-                        {/* Version badge */}
-                        <span className="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground border">
-                          v{entry.version}
-                        </span>
-
-                        {/* Tags */}
-                        {entry.tags.length > 0 && (
-                          <>
-                            {entry.tags.map((tag) => (
-                              <span
-                                key={tag.id}
-                                className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-md uppercase tracking-wide"
-                                style={{
-                                  backgroundColor: tag.color + "15",
-                                  color: tag.color,
-                                  borderLeft: `3px solid ${tag.color}`,
-                                }}
-                              >
-                                {tag.name}
-                              </span>
-                            ))}
-                          </>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-sm prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
-                        <ReactMarkdown>{entry.body}</ReactMarkdown>
-                      </div>
-
-                      {/* Reactions */}
-                      <Reactions entryId={entry.id} />
-                    </article>
-                  ))}
-                </div>
-              </section>
+              </article>
             ))}
           </div>
         )}
