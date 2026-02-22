@@ -93,8 +93,8 @@ export default async function PuclicChangelogPage({
                   })}
                 </time>
 
-                {/* Entry content on the right */}
-                <div className="space-y-4">
+                {/* Entry content on the right with dot indicator */}
+                <div className="relative space-y-4 before:absolute before:left-[-1.5rem] before:top-2 before:h-2 before:w-2 before:rounded-full before:bg-primary before:ring-4 before:ring-primary/10">
                   {/* Entry header */}
                   <div className="flex flex-wrap items-center gap-3">
                     <h2 className="text-xl font-semibold text-pretty group-hover:text-primary transition-colors">
@@ -126,7 +126,7 @@ export default async function PuclicChangelogPage({
                   </div>
 
                   {/* Content */}
-                  <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-sm prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                  <div className="prose prose-sm prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-sm prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-ul:my-4 prose-li:my-1">
                     <ReactMarkdown>{entry.body}</ReactMarkdown>
                   </div>
 
