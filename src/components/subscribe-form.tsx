@@ -43,25 +43,34 @@ export default function SubscribeForm({ projectId }: { projectId: string }) {
 
   // after subscription, showing a confirmation instead of the form. no need to subscribe again
   if (status === "success") {
-    return <p className="text-sm text-green-600">{message}</p>;
+    return (
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900">
+        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+        <p className="text-sm font-medium text-green-600 dark:text-green-400">{message}</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <Input
-        type="email"
-        placeholder="your@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        className="max-w-xs"
-      />
-      <Button type="submit" disabled={status === "loading"}>
-        {status === "loading" ? "Subscribing..." : "Subscribe"}
-      </Button>
+    <div className="w-full max-w-md">
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="flex-1"
+        />
+        <Button type="submit" disabled={status === "loading"} size="default">
+          {status === "loading" ? "Subscribing..." : "Subscribe"}
+        </Button>
+      </form>
       {status === "error" && (
-        <p className="text-sm text-red-500 self-center">{message}</p>
+        <p className="text-sm text-destructive mt-2">{message}</p>
       )}
-    </form>
+    </div>
   );
 }

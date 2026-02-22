@@ -48,23 +48,19 @@ export default function Reactions({ entryId }: { entryId: string }) {
   };
 
   return (
-    <div className="flex gap-2 mt-6">
+    <div className="flex gap-2 mt-6 pt-6 border-t">
       {REACTIONS.map(({ key, icon: Icon }) => (
         <button
           key={key}
           onClick={() => handleReact(key)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm border transition-all hover:scale-105 active:scale-95 ${
             userReactions.includes(key)
-              ? "bg-primary/10 border-primary"
-              : "bg-white border-gray-200 hover:border-gray-300"
+              ? "bg-primary/10 border-primary text-primary shadow-sm"
+              : "bg-card border-border hover:bg-accent hover:border-primary/30"
           }`}
         >
-          {/* Icon is a component variable. We render it like <Icon />.
-              size={14} sets the icon to 14px.
-              When selected, the icon gets the primary color.
-              className applies conditional styling. */}
           <Icon
-            size={14}
+            size={16}
             className={
               userReactions.includes(key)
                 ? "text-primary"
@@ -72,7 +68,11 @@ export default function Reactions({ entryId }: { entryId: string }) {
             }
           />
           {counts[key] > 0 && (
-            <span className="text-xs text-muted-foreground">
+            <span className={`text-xs font-medium ${
+              userReactions.includes(key)
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}>
               {counts[key]}
             </span>
           )}
