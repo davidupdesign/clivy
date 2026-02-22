@@ -1,21 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-    Heart,
-    ArrowBigDown,
-    CircleHelp,
-  } from "lucide-react";
+import { Heart, ArrowBigDown, CircleHelp } from "lucide-react";
 
-// Each reaction has a key (stored in the database)
-// and an icon component (displayed on screen).
-// We use a Map-like array so we can loop over them
-// and also look up the icon by key.
+// Each reaction has its own color when active
 const REACTIONS = [
-    { key: "heart", icon: Heart },
-    { key: "downvote", icon: ArrowBigDown },
-    { key: "question", icon: CircleHelp },
-  ];
+  {
+    key: "heart",
+    icon: Heart,
+    activeColor: "text-red-500",
+    activeBg: "bg-red-500/10",
+    activeBorder: "border-red-500/40",
+  },
+  {
+    key: "downvote",
+    icon: ArrowBigDown,
+    activeColor: "text-orange-500",
+    activeBg: "bg-orange-500/10",
+    activeBorder: "border-orange-500/40",
+  },
+  {
+    key: "question",
+    icon: CircleHelp,
+    activeColor: "text-blue-500",
+    activeBg: "bg-blue-500/10",
+    activeBorder: "border-blue-500/40",
+  },
+];
 
 export default function Reactions({ entryId }: { entryId: string }) {
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -48,36 +59,33 @@ export default function Reactions({ entryId }: { entryId: string }) {
   };
 
   return (
-    <div className="flex gap-2 mt-6">
-      {REACTIONS.map(({ key, icon: Icon }) => (
-        <button
-          key={key}
-          onClick={() => handleReact(key)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors ${
-            userReactions.includes(key)
-              ? "bg-primary/10 border-primary"
-              : "bg-white border-gray-200 hover:border-gray-300"
-          }`}
-        >
-          {/* Icon is a component variable. We render it like <Icon />.
-              size={14} sets the icon to 14px.
-              When selected, the icon gets the primary color.
-              className applies conditional styling. */}
-          <Icon
-            size={14}
-            className={
-              userReactions.includes(key)
-                ? "text-primary"
-                : "text-muted-foreground"
-            }
-          />
-          {counts[key] > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {counts[key]}
-            </span>
-          )}
-        </button>
-      ))}
+    <div className="flex gap-2">
+      {REACTIONS.map(({ key, icon: Icon, activeColor, activeBg, activeBorder }) => {
+        const active = userReactions.includes(key);
+        return (
+          <button
+            key={key}
+            onClick={() => handleReact(key)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-all hover:scale-105 active:scale-95 ${
+              active
+                ? `${activeBg} ${activeBorder} shadow-sm`
+                : "bg-card border-border hover:border-primary/30"
+            }`}
+          >
+            <Icon
+              size={14}
+              className={active ? activeColor : "text-muted-foreground"}
+            />
+            {counts[key] > 0 && (
+              <span
+                className={`text-xs ${active ? activeColor : "text-muted-foreground"}`}
+              >
+                {counts[key]}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

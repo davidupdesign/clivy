@@ -40,6 +40,13 @@ env
 dev-notes.md 
 dev-notes 
 
+# design guides
+/changelog-app
+clivy-design-plan.md
+CLIVY-DESIGN-PLAN.MD
+handoff.md
+HANDOFF.md
+
 # vercel
 .vercel
 

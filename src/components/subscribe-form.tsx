@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 export default function SubscribeForm({ projectId }: { projectId: string }) {
   const [email, setEmail] = useState("");
@@ -10,13 +11,6 @@ export default function SubscribeForm({ projectId }: { projectId: string }) {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [message, setMessage] = useState("");
-
-  // status has 4 possible values:
-
-  // idle = form is ready, nothing happening
-  // loading = request in progress
-  // success = subscribed successfully
-  // error = something went wrong
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,27 +35,33 @@ export default function SubscribeForm({ projectId }: { projectId: string }) {
     setEmail("");
   };
 
-  // after subscription, showing a confirmation instead of the form. no need to subscribe again
   if (status === "success") {
-    return <p className="text-sm text-green-600">{message}</p>;
+    return (
+      <div className="flex items-center gap-2 rounded-md bg-green-50 border border-green-200 px-4 py-2">
+        <Check className="h-4 w-4 text-green-600" />
+        <p className="text-sm text-green-700">{message}</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <Input
-        type="email"
-        placeholder="your@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        className="max-w-xs"
-      />
-      <Button type="submit" disabled={status === "loading"}>
-        {status === "loading" ? "Subscribing..." : "Subscribe"}
-      </Button>
+    <div>
+      <form onSubmit={handleSubmit} className="flex gap-3 max-w-lg">
+        <Input
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="flex-1 h-11 text-base"
+        />
+        <Button type="submit" disabled={status === "loading"} className="h-11 px-6 text-base">
+          {status === "loading" ? "Subscribing..." : "Subscribe"}
+        </Button>
+      </form>
       {status === "error" && (
-        <p className="text-sm text-red-500 self-center">{message}</p>
+        <p className="text-sm text-destructive mt-2">{message}</p>
       )}
-    </form>
+    </div>
   );
 }

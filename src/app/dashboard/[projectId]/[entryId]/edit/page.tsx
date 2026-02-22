@@ -2,11 +2,25 @@
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import ImageUploadField from "@/components/image-upload-field";
+import { ArrowLeft, Plus, Calendar, X } from "lucide-react";
+import { motion } from "framer-motion";
+
+const TAG_COLORS = [
+  { name: "Blue", value: "#3b82f6" },
+  { name: "Green", value: "#22c55e" },
+  { name: "Red", value: "#ef4444" },
+  { name: "Yellow", value: "#eab308" },
+  { name: "Purple", value: "#a855f7" },
+  { name: "Pink", value: "#ec4899" },
+  { name: "Orange", value: "#f97316" },
+  { name: "Teal", value: "#14b8a6" },
+];
 
 type Tag = {
   id: string;
@@ -42,6 +56,13 @@ export default function EditEntryPage({
 
   // scheduling
   const [scheduledAt, setScheduledAt] = useState("");
+  const [showSchedule, setShowSchedule] = useState(false);
+
+  // header image
+  const [headerImage, setHeaderImage] = useState<string | null>(null);
+
+  // editor/preview toggle
+  const [editorTab, setEditorTab] = useState<"write" | "preview">("write");
 
   // fetching available tags when page loads
 
@@ -66,8 +87,12 @@ export default function EditEntryPage({
           setScheduledAt(
             new Date(entryData.entry.publishedAt).toISOString().slice(0, 16),
           );
+          setShowSchedule(true);
         }
         setSelectedTagIds(entryData.entry.tags.map((tag: Tag) => tag.id));
+        if (entryData.entry.headerImage) {
+          setHeaderImage(entryData.entry.headerImage);
+        }
       } else {
         setError("Failed to load entry");
       }
@@ -84,11 +109,22 @@ export default function EditEntryPage({
     // entryid is the dependency array. entryid doesnt change on this page, it runs once
   }, [entryId, projectId]);
 
-  //toggling tag - on/off
+  //toggling tag - on/off (max 4)
   const toggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId],
-    );
+    setSelectedTagIds((prev) => {
+      if (prev.includes(tagId)) return prev.filter((t) => t !== tagId);
+      if (prev.length >= 4) return prev;
+      return [...prev, tagId];
+    });
+  };
+
+  // deleting a tag
+  const handleDeleteTag = async (tagId: string) => {
+    const response = await fetch(`/api/tags/${tagId}`, { method: "DELETE" });
+    if (response.ok) {
+      setAvailableTags((prev) => prev.filter((t) => t.id !== tagId));
+      setSelectedTagIds((prev) => prev.filter((t) => t !== tagId));
+    }
   };
 
   //creating tag
@@ -130,6 +166,7 @@ export default function EditEntryPage({
         status,
         tagIds: selectedTagIds,
         scheduledAt: status === "scheduled" ? scheduledAt : null,
+        headerImage,
       }),
     });
 
@@ -166,174 +203,287 @@ export default function EditEntryPage({
 
   //showing loading while fetching entry data
   if (fetching) {
-    return <p className="text-muted-foreground">Loading entry...</p>;
+    return <p className="text-lg text-muted-foreground">Loading entry...</p>;
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Edit Entry</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+    >
+      <Link
+        href={`/dashboard/${projectId}`}
+        className="inline-flex items-center gap-2 text-lg text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        Back to project
+      </Link>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+      <h1 className="text-4xl font-bold tracking-tight mb-10">Edit Entry</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-10">
+        {/* title + version — title gets more space */}
+        <div className="grid grid-cols-[1fr_180px] gap-5">
+          <div className="space-y-3">
+            <Label htmlFor="title" className="text-2xl font-medium">
+              Title
+            </Label>
             <Input
               id="title"
               placeholder="Changes"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              className="h-13 text-lg"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="version">Version</Label>
+          <div className="space-y-3">
+            <Label htmlFor="version" className="text-2xl font-medium">
+              Version
+            </Label>
             <Input
               id="version"
               placeholder="1.0.0"
               value={version}
               onChange={(e) => setVersion(e.target.value)}
               required
+              className="h-13 text-lg"
             />
           </div>
         </div>
 
         {/* tags */}
-        <div className="space-y-3">
-          <Label>Tags</Label>
+        <div className="space-y-4">
+          <Label className="text-2xl font-medium">Tags</Label>
 
-          <div className="flex flex-wrap gap-2">
-            {availableTags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => toggleTag(tag.id)}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                  selectedTagIds.includes(tag.id)
-                    ? "border-transparent text-white"
-                    : "border-gray-200 bg-white"
-                }`}
-                style={
-                  selectedTagIds.includes(tag.id)
-                    ? { backgroundColor: tag.color }
-                    : { color: tag.color }
-                }
-              >
-                {tag.name}
-              </button>
-            ))}
-          </div>
+          {availableTags.length > 0 && (
+            <div className="flex flex-wrap gap-2.5">
+              {availableTags.map((tag) => (
+                <div key={tag.id} className="relative group">
+                  <button
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className={`text-base font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer uppercase ${
+                      selectedTagIds.includes(tag.id)
+                        ? "ring-2 ring-offset-2 ring-current"
+                        : "opacity-70 hover:opacity-90"
+                    }`}
+                    style={{
+                      backgroundColor: tag.color + "25",
+                      color: tag.color,
+                    }}
+                  >
+                    {tag.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTag(tag.id)}
+                    className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-foreground/80 text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-foreground"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-          <div className="flex gap-2 items-center">
+          {/* create new tag inline */}
+          <div className="flex gap-3 items-center">
             <Input
-              placeholder="New tag name"
+              placeholder="New tag name (Max 16 Ch.)"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
-              className="w-40"
+              maxLength={16}
+              className="w-60 h-12 text-base"
             />
-            <input
-              type="color"
-              value={newTagColor}
-              onChange={(e) => setNewTagColor(e.target.value)}
-              className="w-8 h-8 rounded cursor-pointer"
-            />
+            {/* preset color swatches */}
+            <div className="flex gap-2">
+              {TAG_COLORS.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setNewTagColor(c.value)}
+                  className="w-9 h-9 rounded-full cursor-pointer transition-all border-2"
+                  style={{
+                    backgroundColor: c.value,
+                    borderColor:
+                      newTagColor === c.value
+                        ? "var(--foreground)"
+                        : "transparent",
+                    transform:
+                      newTagColor === c.value ? "scale(1.15)" : "scale(1)",
+                  }}
+                  title={c.name}
+                />
+              ))}
+            </div>
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="lg"
               onClick={handleCreateTag}
+              disabled={!newTagName.trim()}
+              className="h-12 px-6 text-base gap-1.5"
             >
-              Add Tag
+              <Plus className="h-4 w-4" />
+              Add
             </Button>
           </div>
         </div>
 
-        {/* editor and preview side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* editor */}
-          <div className="space-y-2">
-            <Label htmlFor="body">Content (Markdown)</Label>
-            <textarea
-              id="body"
-              className="w-full min-h-[400px] p-3 border rounded-md bg-background text-sm font-mono resize-y"
-              placeholder="Write your changelog in markdown."
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-            />
-          </div>
+        {/* header image */}
+        <div className="space-y-4">
+          <Label className="text-2xl font-medium">Header Image (optional)</Label>
+          <ImageUploadField
+            initialImage={headerImage}
+            onImageChange={(url) => setHeaderImage(url)}
+          />
+        </div>
 
-          {/* preview */}
-          <div className="space-y-2">
-            <Label htmlFor="preview">Preview</Label>
-            <Card className="min-h-[400px]">
-              <CardContent className="pt-6 prose prose-sm max-w-none">
+        {/* editor and preview with toggle */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex bg-muted rounded-full p-1.5 gap-0.5">
+              <button
+                type="button"
+                onClick={() => setEditorTab("write")}
+                className={`px-4 py-2 rounded-full transition-colors cursor-pointer ${
+                  editorTab === "write"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditorTab("preview")}
+                className={`px-4 py-2 rounded-full transition-colors cursor-pointer ${
+                  editorTab === "preview"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+              </button>
+            </div>
+            <span className="text-xl font-medium text-muted-foreground">
+              {editorTab === "write" ? "Content (Markdown)" : "Preview"}
+            </span>
+          </div>
+          <div className="border-2 border-border rounded-xl">
+            {editorTab === "write" ? (
+              <textarea
+                id="body"
+                data-lenis-prevent
+                className="w-full h-[500px] min-h-[200px] p-5 bg-background text-lg font-mono resize-y overflow-y-auto focus:outline-none rounded-xl"
+                placeholder="Write your changelog in markdown."
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+              />
+            ) : (
+              <div data-lenis-prevent className="h-[500px] min-h-[200px] p-5 prose prose-lg max-w-none overflow-y-auto resize-y">
                 {body ? (
                   <ReactMarkdown>{body}</ReactMarkdown>
                 ) : (
-                  <p className="text-muted-foreground">
-                    Start typing to see the preview.
+                  <p className="text-muted-foreground text-lg">
+                    Nothing to preview yet...
                   </p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            )}
           </div>
         </div>
 
         {/* errors */}
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-lg text-red-500">{error}</p>}
 
         {/* buttons */}
-        <div className="flex gap-3">
-          {/* save/draft button */}
+        <div className="flex items-center gap-4">
           <Button
             type="submit"
+            size="lg"
             disabled={loading}
             onClick={() => setStatus("draft")}
+            className="h-12 px-8 text-base"
           >
             {loading ? "Saving..." : "Save Draft"}
           </Button>
-
-          {/* publish button */}
           <Button
             type="submit"
             variant="outline"
+            size="lg"
             disabled={loading}
             onClick={() => setStatus("published")}
+            className="h-12 px-8 text-base"
           >
             Publish
           </Button>
 
-          {/* scheduled button*/}
-          <div className="flex gap-2 items-end">
-            <div className="space-y-1">
-              <Label htmlFor="scheduledAt" className="text-xs">
-                Schedule for
-              </Label>
+          <div className="h-6 w-px bg-border" />
+
+          {!showSchedule ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              onClick={() => setShowSchedule(true)}
+              className="h-12 px-6 text-base gap-2 text-muted-foreground"
+            >
+              <Calendar className="h-5 w-5" />
+              Schedule
+            </Button>
+          ) : (
+            <div className="flex gap-3 items-center">
               <Input
                 id="scheduledAt"
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="w-auto"
+                className="w-auto h-12 text-base"
               />
+              <Button
+                type="submit"
+                variant="outline"
+                size="lg"
+                disabled={loading || !scheduledAt}
+                onClick={() => setStatus("scheduled")}
+                className="h-12 px-8 text-base"
+              >
+                Schedule
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="default"
+                onClick={() => {
+                  setShowSchedule(false);
+                  setScheduledAt("");
+                }}
+                className="h-12 text-base text-muted-foreground"
+              >
+                Cancel
+              </Button>
             </div>
+          )}
+
+          {/* delete button — pushed to the right */}
+          <div className="ml-auto">
             <Button
-              type="submit"
-              variant="outline"
-              disabled={loading || !scheduledAt}
-              onClick={() => setStatus("scheduled")}
+              type="button"
+              variant="destructive"
+              size="lg"
+              onClick={handleDelete}
+              className="h-12 px-8 text-base"
             >
-              Schedule
+              Delete
             </Button>
           </div>
-
-          {/* delete button */}
-          <Button type="button" variant="destructive" onClick={handleDelete}>
-            Delete
-          </Button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }

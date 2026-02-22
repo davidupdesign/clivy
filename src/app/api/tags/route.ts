@@ -52,11 +52,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, color, projectId } = await request.json();
+  const { name: rawName, color, projectId } = await request.json();
+  const name = rawName?.toUpperCase();
 
   if (!name || !color || !projectId) {
     return NextResponse.json(
       { error: "Name, color, and projectId are required" },
+      { status: 400 },
+    );
+  }
+
+  if (name.length > 16) {
+    return NextResponse.json(
+      { error: "Tag name must be 16 characters or less" },
       { status: 400 },
     );
   }

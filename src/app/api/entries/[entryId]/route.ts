@@ -41,65 +41,74 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ entryId: string }> },
 ) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  // awaiting params
-  const { entryId } = await context.params;
+    // awaiting params
+    const { entryId } = await context.params;
 
-  // reading json body (all the fields that user changed)
-  const { title, body, version, status, tagIds, scheduledAt } =
-    await request.json();
+    // reading json body (all the fields that user changed)
+    const { title, body, version, status, tagIds, scheduledAt, headerImage } =
+      await request.json();
 
-  // 1. finding the entry and verifying it belongs to the current user
-  const entry = await prisma.entry.findUnique({
-    where: { id: entryId },
-    include: { project: true },
-  });
+    // 1. finding the entry and verifying it belongs to the current user
+    const entry = await prisma.entry.findUnique({
+      where: { id: entryId },
+      include: { project: true },
+    });
 
-  // entry doesnt exist
-  if (!entry) {
-    return NextResponse.json({ error: "Entry not found" }, { status: 404 });
-  }
+    // entry doesnt exist
+    if (!entry) {
+      return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+    }
 
-  // entry belongs to another user
-  if (entry.project.userId !== session.user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+    // entry belongs to another user
+    if (entry.project.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-  // 2. build update object
-  const updateData = {
-    ...(title && { title }),
-    ...(body && { body }),
-    ...(version && { version }),
-    ...(status && { status }),
-    ...(status === "published" && {
-      publishedAt: entry.publishedAt || new Date(),
-    }),
-    ...(status === "scheduled" &&
-      scheduledAt && {
-        publishedAt: new Date(scheduledAt),
+    // 2. build update object
+    const updateData = {
+      ...(title && { title }),
+      ...(body && { body }),
+      ...(version && { version }),
+      ...(status && { status }),
+      ...(status === "published" && {
+        publishedAt: entry.publishedAt || new Date(),
       }),
-  };
+      ...(status === "scheduled" &&
+        scheduledAt && {
+          publishedAt: new Date(scheduledAt),
+        }),
+      ...(headerImage !== undefined && { headerImage }),
+    };
 
-  // 3. update entry
-  const updatedEntry = await prisma.entry.update({
-    where: { id: entryId },
-    data: {
-      ...updateData,
-      ...(tagIds && {
-        tags: {
-          set: tagIds.map((id: string) => ({ id })),
-        },
-      }),
-    },
-    include: { tags: true },
-  });
+    // 3. update entry
+    const updatedEntry = await prisma.entry.update({
+      where: { id: entryId },
+      data: {
+        ...updateData,
+        ...(tagIds && {
+          tags: {
+            set: tagIds.map((id: string) => ({ id })),
+          },
+        }),
+      },
+      include: { tags: true },
+    });
 
-  return NextResponse.json({ entry: updatedEntry });
+    return NextResponse.json({ entry: updatedEntry });
+  } catch (err) {
+    console.error("PATCH /api/entries/[entryId] error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
 
 // DELETE — remove an entry permanently

@@ -1,15 +1,38 @@
-//@ts-nocheck
+// @ts-nocheck
 
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-
-import Reactions from "@/components/reactions";
+import Link from "next/link";
+import { Rss } from "lucide-react";
 
 import SubscribeForm from "@/components/subscribe-form";
 import ViewTracker from "@/components/view-tracker";
+import ChangelogNavbar from "@/components/changelog-navbar";
+import ChangelogTimeline from "@/components/changelog-timeline";
 
-export default async function PuclicChangelogPage({
+// Group entries by their published date string
+function groupByDate(entries: any[]) {
+  const groups: { date: string; entries: any[] }[] = [];
+
+  for (const entry of entries) {
+    const dateStr = new Date(entry.publishedAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const existing = groups.find((g) => g.date === dateStr);
+    if (existing) {
+      existing.entries.push(entry);
+    } else {
+      groups.push({ date: dateStr, entries: [entry] });
+    }
+  }
+
+  return groups;
+}
+
+export default async function PublicChangelogPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -20,97 +43,69 @@ export default async function PuclicChangelogPage({
     where: { slug },
     include: {
       entries: {
-        where: {
-          status: "published",
-        },
-        orderBy: {
-          publishedAt: "desc",
-        },
-        include: {
-          tags: true,
-        },
+        where: { status: "published" },
+        orderBy: { publishedAt: "desc" },
+        include: { tags: true },
       },
     },
   });
 
-  // not found
   if (!project) {
     notFound();
   }
 
+  const dateGroups = groupByDate(project.entries);
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
+    <div className="min-h-screen">
+      <ChangelogNavbar />
       <ViewTracker entryIds={project.entries.map((e) => e.id)} />
-      {/* project header */}
-      <header className="mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
-        <p className="text-muted-foreground">Changelog</p>
+
+      {/* Header */}
+      <header className="bg-card border-b">
+        <div className="max-w-5xl mx-auto px-4 py-16 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">{project.name}</h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Product updates and improvements
+          </p>
+
+          {/* Subscribe + RSS row */}
+          <div className="flex items-center justify-center gap-4">
+            <SubscribeForm projectId={project.id} />
+            <Link
+              href={`/changelog/${slug}/rss`}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              title="RSS Feed"
+            >
+              <Rss className="h-5 w-5" />
+            </Link>
+          </div>
+        </div>
       </header>
 
-      {/* subscribe section */}
-      <div className="mb-12 text-center">
-        <p className="text-sm text-muted-foreground mb-3">
-          Subscribe to get notified when we publish updates.
-        </p>
-        <div className="flex justify-center">
-          <SubscribeForm projectId={project.id} />
+      {/* Timeline */}
+      <main className="max-w-5xl mx-auto px-4 py-14">
+        {project.entries.length === 0 ? (
+          <p className="text-center text-lg text-muted-foreground py-12">
+            No updates yet. Check back soon!
+          </p>
+        ) : (
+          <ChangelogTimeline dateGroups={dateGroups} />
+        )}
+      </main>
+
+      {/* Powered by Clivy */}
+      <footer className="border-t py-8">
+        <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
+          Powered by
+          <Link
+            href="/"
+            className="font-semibold text-foreground hover:underline"
+          >
+            Clivy
+          </Link>
         </div>
-      </div>
-
-      {/* entries */}
-      {project.entries.length === 0 ? (
-        <p className="text-center text-muted-foreground">
-          No entries yet. Check back soon.
-        </p>
-      ) : (
-        <div className="space-y-12">
-          {project.entries.map((entry) => (
-            <article key={entry.id} className="border-b pb-12 last:border-0">
-              {/* entru ehader, version and date */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primary text-primary-foreground">
-                  v{entry.version}
-                </span>
-
-                <time className="text-sm text-muted-foreground">
-                  {new Date(entry.publishedAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-              </div>
-
-              {/* entry title */}
-              <h2 className="text-2xl font-bold mb-2">{entry.title}</h2>
-
-              {/* tags */}
-              {entry.tags.length > 0 && (
-                <div className="flex gap-2 mb-4">
-                  {entry.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="text-xs px-2 py-1 rounded-full"
-                      style={{
-                        backgroundColor: tag.color + "20",
-                        color: tag.color,
-                      }}
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* markdown content rendered as html */}
-              <div className="prose prose-sm max-w-none">
-                <ReactMarkdown>{entry.body}</ReactMarkdown>
-              </div>
-              <Reactions entryId={entry.id} />
-            </article>
-          ))}
-        </div>
-      )}
+      </footer>
     </div>
   );
 }

@@ -6,53 +6,62 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const { title, body, version, status, projectId, tagIds, scheduledAt } =
-    await request.json();
+    const { title, body, version, status, projectId, tagIds, scheduledAt, headerImage } =
+      await request.json();
 
-  if (!title || !body || !version || !projectId) {
+    if (!title || !body || !version || !projectId) {
+      return NextResponse.json(
+        { error: "Title, body, version, and projectId are required" },
+        { status: 400 },
+      );
+    }
+
+    //project-user verification
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+        userId: session.user.id,
+      },
+    });
+
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    const entry = await prisma.entry.create({
+      data: {
+        title,
+        body,
+        version,
+        status: status || "draft",
+        publishedAt:
+          status === "published"
+            ? new Date()
+            : status === "scheduled"
+              ? new Date(scheduledAt)
+              : null,
+        projectId,
+        ...(headerImage && { headerImage }),
+        tags: {
+          connect: (tagIds || []).map((id: string) => ({ id })),
+        },
+      },
+      include: { tags: true },
+    });
+
+    return NextResponse.json({ entry }, { status: 201 });
+  } catch (err) {
+    console.error("POST /api/entries error:", err);
     return NextResponse.json(
-      { error: "Title, body, version, and projectId are required" },
-      { status: 400 },
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
-
-  //project-user verification
-  const project = await prisma.project.findUnique({
-    where: {
-      id: projectId,
-      userId: session.user.id,
-    },
-  });
-
-  if (!project) {
-    return NextResponse.json({ error: "Project not found" }, { staus: 404 });
-  }
-
-  const entry = await prisma.entry.create({
-    data: {
-      title,
-      body,
-      version,
-      status: status || "draft",
-      publishedAt:
-        status === "published"
-          ? new Date()
-          : status === "scheduled"
-            ? new Date(scheduledAt)
-            : null,
-      projectId,
-      tags: {
-        connect: (tagIds || []).map((id: string) => ({ id })),
-      },
-    },
-    include: { tags: true },
-  });
-
-  return NextResponse.json({ entry }, { status: 201 });
 }

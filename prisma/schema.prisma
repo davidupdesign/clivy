@@ -56,6 +56,7 @@ model Entry {
   version String
   status String @default("draft")
   pinned Boolean @default(false)
+  headerImage String?
   publishedAt DateTime?
   scheduledAt DateTime?
   createdAt DateTime @default(now())

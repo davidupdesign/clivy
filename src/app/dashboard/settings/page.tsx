@@ -3,16 +3,12 @@
 
 import { useState, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import DashboardTabs from "@/components/dashboard-tabs";
+import { toast } from "sonner";
 
 type Project = {
   id: string;
@@ -29,28 +25,35 @@ type Subscriber = {
   subscribedAt: string;
 };
 
+const TABS = [
+  { key: "account", label: "Account" },
+  { key: "projects", label: "Projects" },
+  { key: "subscribers", label: "Subscribers" },
+];
+
+const tabContentVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+};
+
 export default function SettingsPage() {
   const { data: session, update } = useSession();
 
-  // tab state — controls which section is shown
-  const [activeTab, setActiveTab] = useState<
-    "account" | "projects" | "subscribers"
-  >("account");
+  // tab state
+  const [activeTab, setActiveTab] = useState("account");
 
-  // acc state
+  // account state
   const [name, setName] = useState(session?.user?.name || "");
   const [email, setEmail] = useState(session?.user?.email || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [accountMessage, setAccountMessage] = useState("");
-  const [accountError, setAccountError] = useState("");
 
   // projects state
   const [projects, setProjects] = useState<Project[]>([]);
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editSlug, setEditSlug] = useState("");
-  const [projectMessage, setProjectMessage] = useState("");
 
   // subscribers state
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -94,12 +97,10 @@ export default function SettingsPage() {
     fetchSubscribers();
   }, [selectedProjectId]);
 
-  // --- acc handlers ---
+  // --- account handlers ---
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAccountMessage("");
-    setAccountError("");
 
     const response = await fetch("/api/user/profile", {
       method: "PATCH",
@@ -110,13 +111,12 @@ export default function SettingsPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setAccountError(data.error);
+      toast.error(data.error);
       return;
     }
 
-    setAccountMessage("Profile updated successfully");
+    toast.success("Profile updated successfully");
 
-    //refreshing session token with new name/email
     await update({
       name,
       email,
@@ -125,11 +125,9 @@ export default function SettingsPage() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAccountMessage("");
-    setAccountError("");
 
     if (!currentPassword || !newPassword) {
-      setAccountError("Both password fields are required");
+      toast.error("Both password fields are required");
       return;
     }
 
@@ -142,11 +140,11 @@ export default function SettingsPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      setAccountError(data.error);
+      toast.error(data.error);
       return;
     }
 
-    setAccountMessage("Password changed successfully");
+    toast.success("Password changed successfully");
     setCurrentPassword("");
     setNewPassword("");
   };
@@ -160,7 +158,6 @@ export default function SettingsPage() {
       return;
     }
 
-    // double confirmation for destructive action
     const typed = window.prompt('Type "DELETE" to confirm');
     if (typed !== "DELETE") return;
 
@@ -195,8 +192,7 @@ export default function SettingsPage() {
         ),
       );
       setEditingProject(null);
-      setProjectMessage("Project updated");
-      setTimeout(() => setProjectMessage(""), 3000);
+      toast.success("Project updated");
     }
   };
 
@@ -209,10 +205,11 @@ export default function SettingsPage() {
 
     if (response.ok) {
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
+      toast.success("Project deleted");
     }
   };
 
-  // --- sub handlers ---
+  // --- subscriber handlers ---
 
   const handleRemoveSubscriber = async (subscriberId: string) => {
     const response = await fetch(`/api/subscribers/${subscriberId}`, {
@@ -221,272 +218,359 @@ export default function SettingsPage() {
 
     if (response.ok) {
       setSubscribers((prev) => prev.filter((s) => s.id !== subscriberId));
+      toast.success("Subscriber removed");
     }
   };
 
-  // tab button styling helper
-  const tabClass = (tab: string) =>
-    `px-4 py-2 text-sm rounded-md transition-colors ${
-      activeTab === tab
-        ? "bg-primary text-primary-foreground"
-        : "hover:bg-muted"
-    }`;
-
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
-
-      {/* tab nav */}
-      <div className="flex gap-2 mb-8">
-        <button
-          className={tabClass("account")}
-          onClick={() => setActiveTab("account")}
-        >
-          Account
-        </button>
-        <button
-          className={tabClass("projects")}
-          onClick={() => setActiveTab("projects")}
-        >
-          Projects
-        </button>
-        <button
-          className={tabClass("subscribers")}
-          onClick={() => setActiveTab("subscribers")}
-        >
-          Subscribers
-        </button>
-        <button
-          className="px-4 py-2 text-sm rounded-md hover:bg-muted text-red-600"
-          onClick={() => signOut({ callbackUrl: "/login" })}
-        >
-          Sign Out
-        </button>
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-base text-muted-foreground mt-1">
+          Manage your account, projects, and subscribers
+        </p>
       </div>
 
-      {/* ========== acc tab ========== */}
-      {activeTab === "account" && (
-        <div className="space-y-8 max-w-lg">
-          {/* Profile form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>Update your name and email</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
+      <DashboardTabs tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
+
+      <AnimatePresence mode="wait">
+        {/* ========== Account Tab ========== */}
+        {activeTab === "account" && (
+          <motion.div
+            key="account"
+            variants={tabContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="max-w-lg space-y-0"
+          >
+            {/* Profile section */}
+            <section>
+              <h2 className="text-lg font-medium mb-5">Profile information</h2>
+              <form onSubmit={handleUpdateProfile} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name" className="text-base">
+                    Name
+                  </Label>
                   <Input
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    className="h-11 text-base"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-base">
+                    Email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 text-base"
                   />
                 </div>
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit" size="lg">
+                  Save
+                </Button>
               </form>
-            </CardContent>
-          </Card>
+            </section>
 
-          {/* changing password */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Change Password</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-4">
+            <hr className="my-10" />
+
+            {/* Password section */}
+            <section>
+              <h2 className="text-lg font-medium mb-5">Change password</h2>
+              <form onSubmit={handleChangePassword} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="currentPassword" className="text-base">
+                    Current password
+                  </Label>
                   <Input
                     id="currentPassword"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="h-11 text-base"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword" className="text-base">
+                    New password
+                  </Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
+                    className="h-11 text-base"
                   />
                 </div>
-                <Button type="submit">Change Password</Button>
+                <Button type="submit" size="lg">
+                  Update password
+                </Button>
               </form>
-            </CardContent>
-          </Card>
+            </section>
 
-          {/* messages */}
-          {accountMessage && (
-            <p className="text-sm text-green-600">{accountMessage}</p>
-          )}
-          {accountError && (
-            <p className="text-sm text-red-500">{accountError}</p>
-          )}
+            <hr className="my-10" />
 
-          {/* danger zone */}
-          <Card className="border-red-200">
-            <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
-              <CardDescription>
-                Permanently delete your account and all associated data
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="destructive" onClick={handleDeleteAccount}>
+            {/* Danger zone */}
+            <section>
+              <h2 className="text-lg font-medium text-red-600 mb-2">
+                Danger zone
+              </h2>
+              <p className="text-base text-muted-foreground mb-5">
+                Delete your account and all data permanently.
+              </p>
+              <Button
+                variant="destructive"
+                size="lg"
+                onClick={handleDeleteAccount}
+              >
                 Delete Account
               </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </section>
+          </motion.div>
+        )}
 
-      {/* ========== projects tab ========== */}
-      {activeTab === "projects" && (
-        <div className="space-y-4 max-w-lg">
-          {projectMessage && (
-            <p className="text-sm text-green-600">{projectMessage}</p>
-          )}
+        {/* ========== Projects Tab ========== */}
+        {activeTab === "projects" && (
+          <motion.div
+            key="projects"
+            variants={tabContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {projects.length === 0 ? (
+              <div className="border border-dashed rounded-xl py-20 text-center">
+                <p className="text-lg text-muted-foreground mb-1">
+                  No projects yet
+                </p>
+                <p className="text-base text-muted-foreground">
+                  Create a project from the Projects page.
+                </p>
+              </div>
+            ) : (
+              <div className="border rounded-xl overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Project
+                      </th>
+                      <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-40">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {projects.map((project) => (
+                      <tr
+                        key={project.id}
+                        className="border-b last:border-0 hover:bg-muted/20 transition-colors"
+                      >
+                        <td className="px-5 py-4">
+                          <AnimatePresence mode="wait">
+                            {editingProject === project.id ? (
+                              <motion.div
+                                key="editing"
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.98 }}
+                                transition={{ duration: 0.15 }}
+                                className="flex gap-3"
+                              >
+                                <Input
+                                  value={editName}
+                                  onChange={(e) => setEditName(e.target.value)}
+                                  placeholder="Project name"
+                                  className="h-10 text-base"
+                                />
+                                <Input
+                                  value={editSlug}
+                                  onChange={(e) => setEditSlug(e.target.value)}
+                                  placeholder="project-slug"
+                                  className="h-10 text-base"
+                                />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="viewing"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                              >
+                                <p className="text-base font-medium">
+                                  {project.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {project.slug}
+                                </p>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <AnimatePresence mode="wait">
+                            {editingProject === project.id ? (
+                              <motion.div
+                                key="edit-actions"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                className="flex gap-2 justify-end"
+                              >
+                                <Button
+                                  onClick={() => handleSaveProject(project.id)}
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setEditingProject(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="view-actions"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                className="flex gap-3 justify-end"
+                              >
+                                <button
+                                  className="text-base text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                  onClick={() => handleStartEdit(project)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="text-base text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                                  onClick={() => handleDeleteProject(project.id)}
+                                >
+                                  Delete
+                                </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </motion.div>
+        )}
 
-          {projects.length === 0 ? (
-            <p className="text-muted-foreground">No projects yet.</p>
-          ) : (
-            projects.map((project) => (
-              <Card key={project.id}>
-                <CardContent className="pt-6">
-                  {editingProject === project.id ? (
-                    // edit mode
-                    <div className="space-y-3">
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        placeholder="Project name"
-                      />
-                      <Input
-                        value={editSlug}
-                        onChange={(e) => setEditSlug(e.target.value)}
-                        placeholder="project-slug"
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleSaveProject(project.id)}
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingProject(null)}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
+        {/* ========== Subscribers Tab ========== */}
+        {activeTab === "subscribers" && (
+          <motion.div
+            key="subscribers"
+            variants={tabContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* Project selector */}
+            <div className="space-y-2 mb-8 max-w-sm">
+              <Label className="text-base">Select Project</Label>
+              <select
+                className="w-full border rounded-lg px-3 py-2.5 bg-background text-base cursor-pointer"
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+              >
+                <option value="">Choose a project...</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Subscriber list */}
+            <AnimatePresence mode="wait">
+              {selectedProjectId && (
+                <motion.div
+                  key={selectedProjectId}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {subscribers.length === 0 ? (
+                    <div className="border border-dashed rounded-xl py-20 text-center">
+                      <p className="text-lg text-muted-foreground mb-1">
+                        No subscribers yet
+                      </p>
+                      <p className="text-base text-muted-foreground">
+                        Subscribers will appear here once people subscribe to your
+                        changelog.
+                      </p>
                     </div>
                   ) : (
-                    // display mode
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{project.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          /{project.slug}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleStartEdit(project)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteProject(project.id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                    <div className="border rounded-xl overflow-hidden">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b bg-muted/30">
+                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                              Email
+                            </th>
+                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                              Channel
+                            </th>
+                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                              Subscribed
+                            </th>
+                            <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subscribers.map((sub, index) => (
+                            <motion.tr
+                              key={sub.id}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2, delay: index * 0.03 }}
+                              className="border-b last:border-0 hover:bg-muted/20 transition-colors"
+                            >
+                              <td className="px-5 py-4 text-base font-medium">
+                                {sub.email || sub.phone}
+                              </td>
+                              <td className="px-5 py-4 text-base text-muted-foreground capitalize">
+                                {sub.channel}
+                              </td>
+                              <td className="px-5 py-4 text-base text-muted-foreground">
+                                {new Date(sub.subscribedAt).toLocaleDateString()}
+                              </td>
+                              <td className="px-5 py-4 text-right">
+                                <button
+                                  className="text-base text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                                  onClick={() => handleRemoveSubscriber(sub.id)}
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* ========== subscribers tab ========== */}
-      {activeTab === "subscribers" && (
-        <div className="space-y-4 max-w-lg">
-          {/* project selector */}
-          <div className="space-y-2">
-            <Label>Select Project</Label>
-            <select
-              className="w-full border rounded-md p-2 bg-background"
-              value={selectedProjectId}
-              onChange={(e) => setSelectedProjectId(e.target.value)}
-            >
-              <option value="">Choose a project...</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* sub list */}
-          {selectedProjectId && (
-            <>
-              <p className="text-sm text-muted-foreground">
-                {subscribers.length} subscriber{subscribers.length !== 1 && "s"}
-              </p>
-
-              {subscribers.length === 0 ? (
-                <p className="text-muted-foreground">
-                  No subscribers for this project yet.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {subscribers.map((sub) => (
-                    <Card key={sub.id}>
-                      <CardContent className="py-3 flex items-center justify-between">
-                        <div>
-                          <p className="text-sm">{sub.email || sub.phone}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {sub.channel} &middot;{" "}
-                            {new Date(sub.subscribedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleRemoveSubscriber(sub.id)}
-                        >
-                          Remove
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                </motion.div>
               )}
-            </>
-          )}
-        </div>
-      )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

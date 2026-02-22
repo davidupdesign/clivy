@@ -2,16 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function NewProjectPage() {
   const [name, setName] = useState("");
@@ -55,51 +51,66 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="max-w-lg">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create a new project</CardTitle>
-          <CardDescription>
-            Each project has its own changelog page
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Project Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="My Cooool App"
-                value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                required
-              />
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+    >
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Projects
+      </Link>
 
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                type="text"
-                placeholder="my-awesome-app"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Public URL: /changelog/{slug || "your-slug"}
-              </p>
-            </div>
+      <h1 className="text-3xl font-bold tracking-tight mb-2">
+        Create a new project
+      </h1>
+      <p className="text-base text-muted-foreground mb-10">
+        Each project has its own changelog page.
+      </p>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+      <form onSubmit={handleSubmit} className="max-w-lg space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-base">
+            Project Name
+          </Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="My Cooool App"
+            value={name}
+            onChange={(e) => handleNameChange(e.target.value)}
+            required
+            className="h-11 text-base"
+          />
+        </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating..." : "Create Project"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+        <div className="space-y-2">
+          <Label htmlFor="slug" className="text-base">
+            Slug
+          </Label>
+          <Input
+            id="slug"
+            type="text"
+            placeholder="my-awesome-app"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            required
+            className="h-11 text-base"
+          />
+          <p className="text-sm text-muted-foreground">
+            Public URL: /changelog/{slug || "your-slug"}
+          </p>
+        </div>
+
+        {error && <p className="text-base text-red-500">{error}</p>}
+
+        <Button type="submit" size="lg" disabled={loading}>
+          {loading ? "Creating..." : "Create Project"}
+        </Button>
+      </form>
+    </motion.div>
   );
 }
