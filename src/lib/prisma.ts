@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { PrismaClient } from "@prisma/generated";
+import { PrismaClient } from "@/generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = global as unknown as { prisma: any };
