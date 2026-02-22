@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -58,9 +57,23 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({
+      token,
+      user,
+      trigger,
+      session,
+    }: {
+      token: any;
+      user: any;
+      trigger: any;
+      session: any;
+    }) {
       if (user) {
         token.id = user.id;
+      }
+      if (trigger === "update" && session) {
+        token.name = session.name;
+        token.email = session.email;
       }
       return token;
     },
