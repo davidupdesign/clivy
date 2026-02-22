@@ -78,7 +78,7 @@ export default async function PuclicChangelogPage({
             <p className="text-muted-foreground text-lg">No updates yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-12 ml-20">
             {project.entries.map((entry) => (
               <article 
                 key={entry.id} 
