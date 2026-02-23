@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { prisma } from "@/lib/prisma";
-import { resend } from "@/lib/resend";
+import { getResend } from "@/lib/resend";
 
 // strip markdown to create a plain text snippet for the email preview
 function createSnippet(body: string, maxLength = 200): string {
@@ -50,8 +50,8 @@ function buildEmailHtml(params: {
 }
 
 export async function sendPublishNotification(entryId: string): Promise<void> {
-  // skip if resend is not configured
-  if (!process.env.RESEND_API_KEY) return;
+  const resend = getResend();
+  if (!resend) return;
 
   try {
     // fetch entry with project info
