@@ -2,6 +2,7 @@
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPublishNotification } from "@/lib/notifications";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -55,6 +56,13 @@ export async function POST(request: Request) {
       },
       include: { tags: true },
     });
+
+    // send email notifications if published immediately
+    if (entry.status === "published") {
+      sendPublishNotification(entry.id).catch((err) =>
+        console.error("Notification error:", err)
+      );
+    }
 
     return NextResponse.json({ entry }, { status: 201 });
   } catch (err) {

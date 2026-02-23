@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPublishNotification } from "@/lib/notifications";
 
 // GET — fetch a single entry
 export async function GET(
@@ -100,6 +101,13 @@ export async function PATCH(
       },
       include: { tags: true },
     });
+
+    // send email notifications if entry just became published
+    if (updatedEntry.status === "published" && entry.status !== "published") {
+      sendPublishNotification(updatedEntry.id).catch((err) =>
+        console.error("Notification error:", err)
+      );
+    }
 
     return NextResponse.json({ entry: updatedEntry });
   } catch (err) {

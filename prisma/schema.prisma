@@ -60,6 +60,7 @@ model Entry {
   headerImage String?
   publishedAt DateTime?
   scheduledAt DateTime?
+  emailNotificationSent Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

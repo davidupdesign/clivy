@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendPublishNotification } from "@/lib/notifications";
 
 
 export async function GET() {
@@ -21,6 +22,9 @@ export async function GET() {
       where: { id: entry.id },
       data: { status: "published" },
     });
+
+    // send email notifications for newly published entry
+    await sendPublishNotification(entry.id);
   }
 
   return NextResponse.json({
