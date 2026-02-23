@@ -4,6 +4,29 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// GET — fetch single project
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ projectId: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { projectId } = await context.params;
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId, userId: session.user.id },
+  });
+
+  if (!project) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ project });
+}
+
 // PATCH — update project name or slug
 export async function PATCH(
   request: Request,
@@ -15,7 +38,7 @@ export async function PATCH(
   }
 
   const { projectId } = await context.params;
-  const { name, slug } = await request.json();
+  const { name, slug, website } = await request.json();
 
   const project = await prisma.project.findUnique({
     where: { id: projectId, userId: session.user.id },
@@ -27,10 +50,7 @@ export async function PATCH(
 
   const updated = await prisma.project.update({
     where: { id: projectId },
-    data: {
-      ...(name && { name }),
-      ...(slug && { slug }),
-    },
+    data: { name, slug, website },
   });
 
   return NextResponse.json({ project: updated });

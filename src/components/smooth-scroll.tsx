@@ -24,8 +24,12 @@ export default function SmoothScroll() {
 
     requestAnimationFrame(raf);
 
+    // expose lenis instance globally so other components can use it (e.g. scroll-to-top)
+    (window as any).__lenis = lenis;
+
     return () => {
       lenis.destroy();
+      delete (window as any).__lenis;
     };
   }, []);
 

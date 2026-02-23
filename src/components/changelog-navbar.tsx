@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, LogIn, LayoutGrid, LogOut } from "lucide-react";
+import { Home, LogIn, LayoutGrid, LogOut, Menu } from "lucide-react";
 import { toast } from "sonner";
 
 const dropdownVariants = {
@@ -66,8 +66,9 @@ export default function ChangelogNavbar() {
       <div className="p-6 pb-4">
         <button
           onClick={() => setOpen(!open)}
-          className="text-2xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
+          className="flex items-center gap-2.5 text-3xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
         >
+          <Menu className="h-6 w-6" />
           Clivy
         </button>
       </div>

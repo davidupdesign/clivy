@@ -1,35 +1,36 @@
 // @ts-nocheck
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { headers } from "next/headers";
 
-// POST — record a page view
+// POST — record page views with ip-based deduplication
+// accepts an array of entry ids and creates one view per entry per unique visitor
 export async function POST(request: Request) {
-  const { entryId } = await request.json();
+  const { entryIds } = await request.json();
 
-  if (!entryId) {
+  if (!entryIds || !Array.isArray(entryIds) || entryIds.length === 0) {
     return NextResponse.json(
-      { error: "entryId is required" },
+      { error: "entryIds array is required" },
       { status: 400 }
     );
   }
 
-  // verifing thst the entry exists
-  const entry = await prisma.entry.findUnique({
-    where: { id: entryId },
-  });
+  // getting visitor ip — same approach as reactions route
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || "unknown";
 
-  if (!entry) {
-    return NextResponse.json(
-      { error: "Entry not found" },
-      { status: 404 }
-    );
-  }
-
-  // each call = one view. no deduplication — same visitor refreshing counts again
-  // ! for the future - dedupe by ip + time window.
-  await prisma.pageView.create({
-    data: { entryId },
-  });
+  // upsert each entry view — if this ip already viewed this entry, it's a no-op
+  await Promise.all(
+    entryIds.map((entryId) =>
+      prisma.pageView
+        .upsert({
+          where: { entryId_ip: { entryId, ip } },
+          create: { entryId, ip },
+          update: {},
+        })
+        .catch(() => {})
+    )
+  );
 
   return NextResponse.json({ success: true }, { status: 201 });
 }

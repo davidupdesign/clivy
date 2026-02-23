@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 export default function NewProjectPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [website, setWebsite] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function NewProjectPage() {
     const response = await fetch("/api/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, slug }),
+      body: JSON.stringify({ name, slug, website: website || null }),
     });
 
     const data = await response.json();
@@ -102,6 +103,23 @@ export default function NewProjectPage() {
           />
           <p className="text-sm text-muted-foreground">
             Public URL: /changelog/{slug || "your-slug"}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="website" className="text-base">
+            Website <span className="text-muted-foreground font-normal">(optional)</span>
+          </Label>
+          <Input
+            id="website"
+            type="text"
+            placeholder="https://yoursite.com"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            className="h-11 text-base"
+          />
+          <p className="text-sm text-muted-foreground">
+            Shown as a clickable link on your public changelog page.
           </p>
         </div>
 

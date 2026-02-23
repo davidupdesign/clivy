@@ -16,6 +16,7 @@ import {
   Eye,
   Users,
   TrendingUp,
+  Settings,
 } from "lucide-react";
 
 const TABS = [
@@ -95,16 +96,24 @@ export default function ProjectDetail({ project }: { project: any }) {
             <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
             <p className="text-base text-muted-foreground mt-1">{project.slug}</p>
           </div>
-          <a
-            href={`/changelog/${project.slug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="outline" size="lg">
-              View Changelog
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </a>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard/settings?tab=projects">
+              <Button variant="ghost" size="lg">
+                <Settings className="h-4 w-4" />
+                Project Settings
+              </Button>
+            </Link>
+            <a
+              href={`/changelog/${project.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" size="lg">
+                View Changelog
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </a>
+          </div>
         </div>
       </div>
 

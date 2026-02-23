@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ type Project = {
   id: string;
   name: string;
   slug: string;
+  website: string | null;
 };
 
 type Subscriber = {
@@ -39,9 +41,10 @@ const tabContentVariants = {
 
 export default function SettingsPage() {
   const { data: session, update } = useSession();
+  const searchParams = useSearchParams();
 
-  // tab state
-  const [activeTab, setActiveTab] = useState("account");
+  // tab state — reads ?tab= from url so links can open a specific tab directly
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "account");
 
   // account state
   const [name, setName] = useState(session?.user?.name || "");
@@ -54,6 +57,7 @@ export default function SettingsPage() {
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editSlug, setEditSlug] = useState("");
+  const [editWebsite, setEditWebsite] = useState("");
 
   // subscribers state
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -176,23 +180,28 @@ export default function SettingsPage() {
     setEditingProject(project.id);
     setEditName(project.name);
     setEditSlug(project.slug);
+    setEditWebsite(project.website || "");
   };
 
   const handleSaveProject = async (projectId: string) => {
     const response = await fetch(`/api/projects/${projectId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: editName, slug: editSlug }),
+      body: JSON.stringify({ name: editName, slug: editSlug, website: editWebsite || null }),
     });
+
+    const data = await response.json();
 
     if (response.ok) {
       setProjects((prev) =>
         prev.map((p) =>
-          p.id === projectId ? { ...p, name: editName, slug: editSlug } : p,
+          p.id === projectId ? { ...p, name: editName, slug: editSlug, website: editWebsite || null } : p,
         ),
       );
       setEditingProject(null);
       toast.success("Project updated");
+    } else {
+      toast.error(data.error || "Failed to save");
     }
   };
 
@@ -394,6 +403,12 @@ export default function SettingsPage() {
                                   placeholder="project-slug"
                                   className="h-10 text-base"
                                 />
+                                <Input
+                                  value={editWebsite}
+                                  onChange={(e) => setEditWebsite(e.target.value)}
+                                  placeholder="https://yoursite.com"
+                                  className="h-10 text-base"
+                                />
                               </motion.div>
                             ) : (
                               <motion.div
@@ -409,6 +424,16 @@ export default function SettingsPage() {
                                 <p className="text-sm text-muted-foreground">
                                   {project.slug}
                                 </p>
+                                {project.website && (
+                                  <a
+                                    href={project.website}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                  >
+                                    {project.website}
+                                  </a>
+                                )}
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -425,11 +450,13 @@ export default function SettingsPage() {
                                 className="flex gap-2 justify-end"
                               >
                                 <Button
+                                  type="button"
                                   onClick={() => handleSaveProject(project.id)}
                                 >
                                   Save
                                 </Button>
                                 <Button
+                                  type="button"
                                   variant="outline"
                                   onClick={() => setEditingProject(null)}
                                 >

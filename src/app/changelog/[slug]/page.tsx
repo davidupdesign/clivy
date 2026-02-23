@@ -3,12 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Rss } from "lucide-react";
+import { Rss, ExternalLink } from "lucide-react";
 
 import SubscribeForm from "@/components/subscribe-form";
 import ViewTracker from "@/components/view-tracker";
 import ChangelogNavbar from "@/components/changelog-navbar";
 import ChangelogTimeline from "@/components/changelog-timeline";
+import ScrollToTop from "@/components/scroll-to-top";
 
 // Group entries by their published date string
 function groupByDate(entries: any[]) {
@@ -60,14 +61,27 @@ export default async function PublicChangelogPage({
     <div className="min-h-screen">
       <ChangelogNavbar />
       <ViewTracker entryIds={project.entries.map((e) => e.id)} />
+      <ScrollToTop />
 
       {/* Header */}
       <header className="bg-card border-b">
         <div className="max-w-5xl mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">{project.name}</h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Product updates and improvements
-          </p>
+          {project.website ? (
+            <a
+              href={project.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-lg text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              {project.website.replace(/^https?:\/\//, "")}
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          ) : (
+            <p className="text-lg text-muted-foreground mb-8">
+              Product updates and improvements
+            </p>
+          )}
 
           {/* Subscribe + RSS row */}
           <div className="flex items-center justify-center gap-4">

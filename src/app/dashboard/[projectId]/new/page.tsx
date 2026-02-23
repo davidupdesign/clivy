@@ -59,16 +59,28 @@ export default function NewEntryPage({
   // editor/preview toggle
   const [editorTab, setEditorTab] = useState<"write" | "preview">("write");
 
-  // fetching available tags when page loads
+  // previous version — shown as a hint next to the version input
+  const [previousVersion, setPreviousVersion] = useState<string | null>(null);
+
+  // fetching available tags and latest version when page loads
   useEffect(() => {
-    async function fetchTags() {
-      const response = await fetch(`/api/tags?projectId=${projectId}`);
-      if (response.ok) {
-        const data = await response.json();
+    async function fetchData() {
+      const [tagsRes, versionRes] = await Promise.all([
+        fetch(`/api/tags?projectId=${projectId}`),
+        fetch(`/api/entries/latest-version?projectId=${projectId}`),
+      ]);
+
+      if (tagsRes.ok) {
+        const data = await tagsRes.json();
         setAvailableTags(data.tags);
       }
+
+      if (versionRes.ok) {
+        const data = await versionRes.json();
+        if (data.version) setPreviousVersion(data.version);
+      }
     }
-    fetchTags();
+    fetchData();
   }, [projectId]);
 
   // toggle for a tag - on/off (max 4)
@@ -191,6 +203,11 @@ export default function NewEntryPage({
               required
               className="h-13 text-lg"
             />
+            {previousVersion && (
+              <p className="text-sm text-muted-foreground">
+                Previous: <span className="font-medium">v{previousVersion}</span>
+              </p>
+            )}
           </div>
         </div>
 
