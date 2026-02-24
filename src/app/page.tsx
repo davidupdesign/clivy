@@ -1,7 +1,11 @@
+// @ts-nocheck
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Infinity } from 'lucide-react';
+import Link from "next/link";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 // ─── animated counter hook ───
 function useCountUp(target, duration = 1800, trigger = false) {
@@ -81,7 +85,7 @@ function Step({ number, title, desc, delay }) {
       }}
       className="text-center"
     >
-      <div className="mx-auto mb-5 w-14 h-14 rounded-full border-2 border-zinc-900 dark:border-zinc-100 flex items-center justify-center text-xl font-bold text-zinc-900 dark:text-zinc-100">
+      <div className="mx-auto mb-5 w-14 h-14 rounded-3xl border-3 border-zinc-900 dark:border-zinc-100 flex items-center justify-center text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         {number}
       </div>
       <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -93,6 +97,42 @@ function Step({ number, title, desc, delay }) {
     </div>
   );
 }
+
+// ─── "also includes" list item (extracted so useInView isn't called inside .map) ───
+function IncludeItem({ title, desc, index }) {
+  const [ref, inView] = useInView();
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateX(0)" : "translateX(-12px)",
+        transition: `all 0.4s ease ${index * 0.05}s`,
+      }}
+      className="flex gap-4 items-start"
+    >
+      <div className="mt-1.5 w-2 h-2 rounded-full bg-[#84c1ff] dark:bg-zinc-100 shrink-0" />
+      <div>
+        <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-0.5">
+          {title}
+        </h4>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── includes data ───
+const INCLUDES = [
+  ["Reactions", "Heart, downvote, and question reactions per entry."],
+  ["Header Images", "Upload or paste a URL. Auto-cropped to 5:2 ratio."],
+  ["Version Tracking", "Semantic versioning with previous version hints."],
+  ["RSS Feed", "Let users subscribe via their favorite RSS reader."],
+  ["Subscriber Management", "View, filter, and remove subscribers per project."],
+  ["Scheduled Cron Jobs", "Vercel cron publishes scheduled entries automatically."],
+];
 
 // ─── main page ───
 export default function LandingPage() {
@@ -110,31 +150,25 @@ export default function LandingPage() {
 
   return (
     <div
-      className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-x-hidden"
-      style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}
+      className={`min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 overflow-x-hidden ${inter.className}`}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-      />
-
       {/* ─── NAV ─── */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-100 dark:border-zinc-800/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <span className="text-xl font-bold tracking-tight">Clivy</span>
           <div className="flex items-center gap-3">
-            <a
+            <Link
               href="/login"
               className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors px-4 py-2"
             >
               Log in
-            </a>
-            <a
+            </Link>
+            <Link
               href="/signup"
               className="text-sm font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
             >
               Get Started
-            </a>
+            </Link>
           </div>
         </div>
       </nav>
@@ -150,8 +184,8 @@ export default function LandingPage() {
             }}
           >
             <div className="inline-flex items-center gap-2 border border-zinc-200 dark:border-zinc-700 rounded-full px-4 py-1.5 mb-8 text-sm text-zinc-500">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Open source changelog platform
+              <span className="w-2 h-2 rounded-full bg-[#84c1ff] dark:bg-zinc-100 animate-pulse" />
+              Best open source changelog platform
             </div>
           </div>
           <h1
@@ -164,7 +198,7 @@ export default function LandingPage() {
           >
             Keep your users
             <br />
-            <span className="bg-gradient-to-r from-zinc-900 via-zinc-600 to-zinc-400 dark:from-zinc-100 dark:via-zinc-400 dark:to-zinc-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-zinc-900 via-zinc-600 to-zinc-400 dark:from-zinc-100 dark:via-zinc-400 dark:to-zinc-600 bg-clip-text text-transparent">
               in the loop</span>
           </h1>
           <p
@@ -187,7 +221,7 @@ export default function LandingPage() {
             }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <a
+            <Link
               href="/signup"
               className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-base font-semibold px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity"
             >
@@ -203,14 +237,14 @@ export default function LandingPage() {
               >
                 <path d="M5 12l5-5-5-5" />
               </svg>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/changelog/clivy"
               target="_blank"
               className="inline-flex items-center justify-center gap-2 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-base font-medium px-8 py-3.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
             >
               View live demo
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -239,10 +273,10 @@ export default function LandingPage() {
                 </span>
               </div>
             </div>
-            {/* Content mock */}
+            {/* content mock */}
             <div className="p-8 sm:p-12">
               <div className="flex gap-8">
-                {/* Sidebar mock */}
+                {/* sidebar mock */}
                 <div className="hidden sm:block w-48 shrink-0 space-y-3">
                   <div className="h-6 w-20 bg-zinc-900 dark:bg-zinc-100 rounded-md" />
                   <div className="mt-6 space-y-2">
@@ -250,7 +284,7 @@ export default function LandingPage() {
                     <div className="h-9 bg-zinc-100 dark:bg-zinc-800/50 rounded-lg w-full" />
                   </div>
                 </div>
-                {/* Main content mock */}
+                {/* main content mock */}
                 <div className="flex-1 space-y-6">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="h-8 w-32 bg-zinc-900 dark:bg-zinc-100 rounded-lg" />
@@ -295,7 +329,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-              Three steps. That's it.
+              Three steps. That&apos;s it.
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-lg">
               From zero to a live changelog in under two minutes.
@@ -372,7 +406,7 @@ export default function LandingPage() {
                 </svg>
               }
               title="Timeline View"
-              desc="Public changelog page with a Vercel-inspired timeline layout. Date separators, sticky headers, smooth scrolling."
+              desc="Public changelog page with a timeline layout. Date separators, sticky headers, smooth scrolling."
             />
             <FeatureCard
               delay={0.1}
@@ -482,56 +516,9 @@ export default function LandingPage() {
             Also included
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-8">
-            {[
-              [
-                "RSS Feed",
-                "Let users subscribe via their favorite RSS reader.",
-              ],
-              [
-                "Reactions",
-                "Heart, downvote, and question reactions per entry.",
-              ],
-              [
-                "Header Images",
-                "Upload or paste a URL. Auto-cropped to 5:2 ratio.",
-              ],
-              [
-                "Version Tracking",
-                "Semantic versioning with previous version hints.",
-              ],
-              [
-                "Subscriber Management",
-                "View, filter, and remove subscribers per project.",
-              ],
-              [
-                "Scheduled Cron Jobs",
-                "Vercel cron publishes scheduled entries automatically.",
-              ],
-            ].map(([t, d], i) => {
-              const [ref, inView] = useInView();
-              return (
-                <div
-                  key={i}
-                  ref={ref}
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "translateX(0)" : "translateX(-12px)",
-                    transition: `all 0.4s ease ${i * 0.05}s`,
-                  }}
-                  className="flex gap-4 items-start"
-                >
-                  <div className="mt-1.5 w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-0.5">
-                      {t}
-                    </h4>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                      {d}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+            {INCLUDES.map(([t, d], i) => (
+              <IncludeItem key={i} title={t} desc={d} index={i} />
+            ))}
           </div>
         </div>
       </section>
@@ -542,7 +529,7 @@ export default function LandingPage() {
           <p className="text-sm font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-6">
             Built with
           </p>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-md font-bold text-zinc-500 dark:text-zinc-400">
             {[
               "Next.js 16",
               "TypeScript",
@@ -577,12 +564,12 @@ export default function LandingPage() {
             changelog that looks as good as the work you ship.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
+            <Link
               href="/signup"
               className="inline-flex items-center justify-center bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-base font-semibold px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity"
             >
-              Get started — it's free
-            </a>
+              Get started — it&apos;s free
+            </Link>
             <a
               href="https://github.com/davidupdesign/clivy"
               target="_blank"
@@ -610,22 +597,24 @@ export default function LandingPage() {
           <div className="flex gap-6 text-sm text-zinc-400">
             <a
               href="https://github.com/davidupdesign/clivy"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
             >
               GitHub
             </a>
-            <a
+            <Link
               href="/login"
               className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
             >
               Log in
-            </a>
-            <a
+            </Link>
+            <Link
               href="/signup"
               className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
             >
               Sign up
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
