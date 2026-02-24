@@ -144,8 +144,8 @@ export default function LandingPage() {
     return () => clearTimeout(t);
   }, []);
 
-  const c1 = useCountUp(500, 1600, statsInView);
-  const c2 = useCountUp(12, 1200, statsInView);
+  const c1 = useCountUp(30, 1600, statsInView);
+  const c2 = useCountUp(15, 1200, statsInView);
   const c3 = useCountUp(99, 1400, statsInView);
 
   return (
