@@ -7,7 +7,7 @@ A full-stack changelog and release notes SaaS built with Next.js 16, TypeScript,
 
 ## Live Demo
 
-[**VIEW LIVE SITE**](https://clivy.vercel.app) · [**VIEW SAMPLE CHANGELOG**](https://clivy.vercel.app/changelog/clivy)
+[**VIEW LIVE SITE**](https://clivy-one.vercel.app/) · [**VIEW SAMPLE CHANGELOG**](https://clivy-one.vercel.app/changelog/clivy)
 
 ---
 
