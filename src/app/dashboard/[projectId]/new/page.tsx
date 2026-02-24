@@ -177,7 +177,7 @@ export default function NewEntryPage({
 
       <form onSubmit={handleSubmit} className="space-y-10">
         {/* title + version — title gets more space */}
-        <div className="grid grid-cols-[1fr_180px] gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-5">
           <div className="space-y-3">
             <Label htmlFor="title" className="text-2xl font-medium">
               Title
@@ -205,7 +205,8 @@ export default function NewEntryPage({
             />
             {previousVersion && (
               <p className="text-sm text-muted-foreground">
-                Previous: <span className="font-medium">v{previousVersion}</span>
+                Previous:{" "}
+                <span className="font-medium">v{previousVersion}</span>
               </p>
             )}
           </div>
@@ -248,7 +249,7 @@ export default function NewEntryPage({
           )}
 
           {/* create new tag inline */}
-          <div className="flex gap-3 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             <Input
               placeholder="New tag name (Max 16 Ch.)"
               value={newTagName}
@@ -257,7 +258,7 @@ export default function NewEntryPage({
               className="w-60 h-12 text-base"
             />
             {/* preset color swatches */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {TAG_COLORS.map((c) => (
                 <button
                   key={c.value}
@@ -293,7 +294,9 @@ export default function NewEntryPage({
 
         {/* header image */}
         <div className="space-y-4">
-          <Label className="text-2xl font-medium">Header Image (optional)</Label>
+          <Label className="text-2xl font-medium">
+            Header Image (optional)
+          </Label>
           <ImageUploadField onImageChange={(url) => setHeaderImage(url)} />
         </div>
 
@@ -310,7 +313,20 @@ export default function NewEntryPage({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
               </button>
               <button
                 type="button"
@@ -321,7 +337,20 @@ export default function NewEntryPage({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
               </button>
             </div>
             <span className="text-xl font-medium text-muted-foreground">
@@ -340,7 +369,10 @@ export default function NewEntryPage({
                 required
               />
             ) : (
-              <div data-lenis-prevent className="h-[500px] min-h-[200px] p-5 prose prose-lg max-w-none overflow-y-auto resize-y">
+              <div
+                data-lenis-prevent
+                className="h-[500px] min-h-[200px] p-5 prose prose-lg max-w-none overflow-y-auto resize-y"
+              >
                 {body ? (
                   <ReactMarkdown>{body}</ReactMarkdown>
                 ) : (
@@ -356,7 +388,7 @@ export default function NewEntryPage({
         {error && <p className="text-lg text-red-500">{error}</p>}
 
         {/* buttons */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Button
             type="submit"
             size="lg"
@@ -391,7 +423,7 @@ export default function NewEntryPage({
               Schedule
             </Button>
           ) : (
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-wrap gap-3 items-center">
               <Input
                 id="scheduledAt"
                 type="datetime-local"

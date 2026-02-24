@@ -389,8 +389,7 @@ export default function SettingsPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.98 }}
                                 transition={{ duration: 0.15 }}
-                                className="flex gap-3"
-                              >
+className="flex flex-col sm:flex-row gap-3"                              >
                                 <Input
                                   value={editName}
                                   onChange={(e) => setEditName(e.target.value)}
@@ -545,52 +544,69 @@ export default function SettingsPage() {
                     </div>
                   ) : (
                     <div className="border rounded-xl overflow-hidden">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b bg-muted/30">
-                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
-                              Email
-                            </th>
-                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
-                              Channel
-                            </th>
-                            <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
-                              Subscribed
-                            </th>
-                            <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {subscribers.map((sub, index) => (
-                            <motion.tr
-                              key={sub.id}
-                              initial={{ opacity: 0, y: 6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.2, delay: index * 0.03 }}
-                              className="border-b last:border-0 hover:bg-muted/20 transition-colors"
-                            >
-                              <td className="px-5 py-4 text-base font-medium">
-                                {sub.email || sub.phone}
-                              </td>
-                              <td className="px-5 py-4 text-base text-muted-foreground capitalize">
-                                {sub.channel}
-                              </td>
-                              <td className="px-5 py-4 text-base text-muted-foreground">
-                                {new Date(sub.subscribedAt).toLocaleDateString()}
-                              </td>
-                              <td className="px-5 py-4 text-right">
-                                <button
-                                  className="text-base text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                  onClick={() => handleRemoveSubscriber(sub.id)}
-                                >
-                                  Remove
-                                </button>
-                              </td>
-                            </motion.tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+  {/* Desktop table */}
+  <table className="hidden sm:table w-full">
+    <thead>
+      <tr className="border-b bg-muted/30">
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Email</th>
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Channel</th>
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Subscribed</th>
+        <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {subscribers.map((sub, index) => (
+        <motion.tr
+          key={sub.id}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: index * 0.03 }}
+          className="border-b last:border-0 hover:bg-muted/20 transition-colors"
+        >
+          <td className="px-5 py-4 text-base font-medium">{sub.email || sub.phone}</td>
+          <td className="px-5 py-4 text-base text-muted-foreground capitalize">{sub.channel}</td>
+          <td className="px-5 py-4 text-base text-muted-foreground">
+            {new Date(sub.subscribedAt).toLocaleDateString()}
+          </td>
+          <td className="px-5 py-4 text-right">
+            <button
+              className="text-base text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+              onClick={() => handleRemoveSubscriber(sub.id)}
+            >
+              Remove
+            </button>
+          </td>
+        </motion.tr>
+      ))}
+    </tbody>
+  </table>
+
+  {/* Mobile list */}
+  <div className="sm:hidden divide-y">
+    {subscribers.map((sub, index) => (
+      <motion.div
+        key={sub.id}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: index * 0.03 }}
+        className="px-4 py-4 flex items-center justify-between gap-3"
+      >
+        <div className="min-w-0">
+          <p className="text-base font-medium truncate">{sub.email || sub.phone}</p>
+          <p className="text-sm text-muted-foreground">
+            {sub.channel} · {new Date(sub.subscribedAt).toLocaleDateString()}
+          </p>
+        </div>
+        <button
+          className="text-sm text-muted-foreground hover:text-destructive transition-colors cursor-pointer shrink-0"
+          onClick={() => handleRemoveSubscriber(sub.id)}
+        >
+          Remove
+        </button>
+      </motion.div>
+    ))}
+  </div>
+</div>
                   )}
                 </motion.div>
               )}

@@ -68,12 +68,16 @@ export default function ProjectDetail({ project }: { project: any }) {
 
   const handleDeleteEntry = async (entryId: string) => {
     if (!window.confirm("Are you sure you want to delete this entry?")) return;
-    const response = await fetch(`/api/entries/${entryId}`, { method: "DELETE" });
+    const response = await fetch(`/api/entries/${entryId}`, {
+      method: "DELETE",
+    });
     if (response.ok) router.refresh();
   };
 
   const handleRemoveSubscriber = async (subscriberId: string) => {
-    const response = await fetch(`/api/subscribers/${subscriberId}`, { method: "DELETE" });
+    const response = await fetch(`/api/subscribers/${subscriberId}`, {
+      method: "DELETE",
+    });
     if (response.ok) {
       setSubscribers((prev) => prev.filter((s) => s.id !== subscriberId));
     }
@@ -91,12 +95,16 @@ export default function ProjectDetail({ project }: { project: any }) {
           Projects
         </Link>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-            <p className="text-base text-muted-foreground mt-1">{project.slug}</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {project.name}
+            </h1>
+            <p className="text-base text-muted-foreground mt-1">
+              {project.slug}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link href="/dashboard/settings?tab=projects">
               <Button variant="ghost" size="lg">
                 <Settings className="h-4 w-4" />
@@ -118,7 +126,11 @@ export default function ProjectDetail({ project }: { project: any }) {
       </div>
 
       {/* Tabs */}
-      <DashboardTabs tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
+      <DashboardTabs
+        tabs={TABS}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
       {/* Tab Content */}
       <AnimatePresence mode="wait">
@@ -142,7 +154,9 @@ export default function ProjectDetail({ project }: { project: any }) {
 
             {project.entries.length === 0 ? (
               <div className="border border-dashed rounded-xl py-20 text-center">
-                <p className="text-lg text-muted-foreground mb-1">No entries yet</p>
+                <p className="text-lg text-muted-foreground mb-1">
+                  No entries yet
+                </p>
                 <p className="text-base text-muted-foreground mb-6">
                   Create your first changelog entry.
                 </p>
@@ -155,15 +169,28 @@ export default function ProjectDetail({ project }: { project: any }) {
               </div>
             ) : (
               <div className="border rounded-xl overflow-hidden">
-                <table className="w-full">
+                {/* Desktop table */}
+                <table className="hidden md:table w-full">
                   <thead>
                     <tr className="border-b bg-muted/30">
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Title</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Version</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Tags</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Date</th>
-                      <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground">Views</th>
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Title
+                      </th>
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Version
+                      </th>
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Tags
+                      </th>
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Status
+                      </th>
+                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Date
+                      </th>
+                      <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground">
+                        Views
+                      </th>
                       <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
                     </tr>
                   </thead>
@@ -176,11 +203,21 @@ export default function ProjectDetail({ project }: { project: any }) {
                         transition={{ duration: 0.2, delay: index * 0.03 }}
                         className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
                         onClick={() =>
-                          router.push(`/dashboard/${project.id}/${entry.id}/edit`)
+                          router.push(
+                            `/dashboard/${project.id}/${entry.id}/edit`,
+                          )
                         }
                       >
                         <td className="px-5 py-4 text-base font-medium w-[40%]">
-                          <div className="truncate" style={{ maskImage: "linear-gradient(to right, black 85%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)" }}>
+                          <div
+                            className="truncate"
+                            style={{
+                              maskImage:
+                                "linear-gradient(to right, black 85%, transparent 100%)",
+                              WebkitMaskImage:
+                                "linear-gradient(to right, black 85%, transparent 100%)",
+                            }}
+                          >
                             {entry.title}
                           </div>
                         </td>
@@ -224,7 +261,9 @@ export default function ProjectDetail({ project }: { project: any }) {
                             className="flex gap-1.5 justify-end"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <Link href={`/dashboard/${project.id}/${entry.id}/edit`}>
+                            <Link
+                              href={`/dashboard/${project.id}/${entry.id}/edit`}
+                            >
                               <button
                                 className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                                 title="Edit"
@@ -245,6 +284,54 @@ export default function ProjectDetail({ project }: { project: any }) {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Mobile card list */}
+                <div className="md:hidden divide-y">
+                  {project.entries.map((entry, index) => (
+                    <motion.div
+                      key={entry.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.03 }}
+                      className="p-4 hover:bg-muted/20 transition-colors cursor-pointer"
+                      onClick={() =>
+                        router.push(`/dashboard/${project.id}/${entry.id}/edit`)
+                      }
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h3 className="text-base font-medium line-clamp-1">
+                          {entry.title}
+                        </h3>
+                        <StatusBadge status={entry.status} />
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <span className="font-bold">v{entry.version}</span>
+                        <span>
+                          {entry.publishedAt
+                            ? new Date(entry.publishedAt).toLocaleDateString()
+                            : new Date(entry.createdAt).toLocaleDateString()}
+                        </span>
+                        <span>{entry._count.pageViews} views</span>
+                      </div>
+                      {entry.tags.length > 0 && (
+                        <div className="flex gap-1.5 mt-2">
+                          {entry.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="text-xs font-medium px-2 py-0.5 rounded-md uppercase"
+                              style={{
+                                backgroundColor: tag.color + "15",
+                                color: tag.color,
+                              }}
+                            >
+                              {tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             )}
           </motion.div>
@@ -261,51 +348,79 @@ export default function ProjectDetail({ project }: { project: any }) {
           >
             {subscribers.length === 0 ? (
               <div className="border border-dashed rounded-xl py-20 text-center">
-                <p className="text-lg text-muted-foreground mb-1">No subscribers yet</p>
+                <p className="text-lg text-muted-foreground mb-1">
+                  No subscribers yet
+                </p>
                 <p className="text-base text-muted-foreground">
-                  Subscribers will appear here once people subscribe to your changelog.
+                  Subscribers will appear here once people subscribe to your
+                  changelog.
                 </p>
               </div>
             ) : (
               <div className="border rounded-xl overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Email</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Channel</th>
-                      <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Subscribed</th>
-                      <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {subscribers.map((sub, index) => (
-                      <motion.tr
-                        key={sub.id}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.03 }}
-                        className="border-b last:border-0 hover:bg-muted/20 transition-colors"
-                      >
-                        <td className="px-5 py-4 text-base font-medium">{sub.email || sub.phone}</td>
-                        <td className="px-5 py-4 text-base text-muted-foreground capitalize">
-                          {sub.channel}
-                        </td>
-                        <td className="px-5 py-4 text-base text-muted-foreground">
-                          {new Date(sub.subscribedAt).toLocaleDateString()}
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <button
-                            className="text-sm text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                            onClick={() => handleRemoveSubscriber(sub.id)}
-                          >
-                            Remove
-                          </button>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+  {/* Desktop table */}
+  <table className="hidden sm:table w-full">
+    <thead>
+      <tr className="border-b bg-muted/30">
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Email</th>
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Channel</th>
+        <th className="text-left px-5 py-4 text-sm font-medium text-muted-foreground">Subscribed</th>
+        <th className="text-right px-5 py-4 text-sm font-medium text-muted-foreground w-24"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {subscribers.map((sub, index) => (
+        <motion.tr
+          key={sub.id}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: index * 0.03 }}
+          className="border-b last:border-0 hover:bg-muted/20 transition-colors"
+        >
+          <td className="px-5 py-4 text-base font-medium">{sub.email || sub.phone}</td>
+          <td className="px-5 py-4 text-base text-muted-foreground capitalize">{sub.channel}</td>
+          <td className="px-5 py-4 text-base text-muted-foreground">
+            {new Date(sub.subscribedAt).toLocaleDateString()}
+          </td>
+          <td className="px-5 py-4 text-right">
+            <button
+              className="text-base text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+              onClick={() => handleRemoveSubscriber(sub.id)}
+            >
+              Remove
+            </button>
+          </td>
+        </motion.tr>
+      ))}
+    </tbody>
+  </table>
+
+  {/* Mobile list */}
+  <div className="sm:hidden divide-y">
+    {subscribers.map((sub, index) => (
+      <motion.div
+        key={sub.id}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: index * 0.03 }}
+        className="px-4 py-4 flex items-center justify-between gap-3"
+      >
+        <div className="min-w-0">
+          <p className="text-base font-medium truncate">{sub.email || sub.phone}</p>
+          <p className="text-sm text-muted-foreground">
+            {sub.channel} · {new Date(sub.subscribedAt).toLocaleDateString()}
+          </p>
+        </div>
+        <button
+          className="text-sm text-muted-foreground hover:text-destructive transition-colors cursor-pointer shrink-0"
+          onClick={() => handleRemoveSubscriber(sub.id)}
+        >
+          Remove
+        </button>
+      </motion.div>
+    ))}
+  </div>
+</div>
             )}
           </motion.div>
         )}
@@ -322,9 +437,24 @@ export default function ProjectDetail({ project }: { project: any }) {
             {/* Stats cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
               {[
-                { icon: Eye, label: "Total views", value: totalViews.toLocaleString(), large: true },
-                { icon: Users, label: "Subscribers", value: subscribers.length, large: true },
-                { icon: TrendingUp, label: "Top entry", value: topEntry ? topEntry.title : "—", large: false },
+                {
+                  icon: Eye,
+                  label: "Total views",
+                  value: totalViews.toLocaleString(),
+                  large: true,
+                },
+                {
+                  icon: Users,
+                  label: "Subscribers",
+                  value: subscribers.length,
+                  large: true,
+                },
+                {
+                  icon: TrendingUp,
+                  label: "Top entry",
+                  value: topEntry ? topEntry.title : "—",
+                  large: false,
+                },
               ].map((card, index) => (
                 <motion.div
                   key={card.label}
@@ -337,7 +467,9 @@ export default function ProjectDetail({ project }: { project: any }) {
                     <card.icon className="h-5 w-5" />
                     {card.label}
                   </div>
-                  <p className={`font-bold tracking-tight truncate ${card.large ? "text-4xl" : "text-xl font-semibold"}`}>
+                  <p
+                    className={`font-bold tracking-tight truncate ${card.large ? "text-4xl" : "text-xl font-semibold"}`}
+                  >
                     {card.value}
                   </p>
                 </motion.div>
@@ -347,7 +479,9 @@ export default function ProjectDetail({ project }: { project: any }) {
             {/* Entries by views */}
             {project.entries.length === 0 ? (
               <div className="border border-dashed rounded-xl py-20 text-center">
-                <p className="text-base text-muted-foreground">No entries to analyze yet.</p>
+                <p className="text-base text-muted-foreground">
+                  No entries to analyze yet.
+                </p>
               </div>
             ) : (
               <div>
@@ -365,7 +499,7 @@ export default function ProjectDetail({ project }: { project: any }) {
                         transition={{ duration: 0.25, delay: index * 0.05 }}
                         className="flex items-center gap-5"
                       >
-                        <span className="text-base w-56 truncate shrink-0">
+                        <span className="text-sm sm:text-base w-28 sm:w-56 truncate shrink-0">
                           {entry.title}
                         </span>
                         <div className="flex-1 bg-muted rounded-full h-2.5 overflow-hidden">
@@ -375,7 +509,11 @@ export default function ProjectDetail({ project }: { project: any }) {
                             animate={{
                               width: `${maxViews > 0 ? (entry._count.pageViews / maxViews) * 100 : 0}%`,
                             }}
-                            transition={{ duration: 0.5, delay: index * 0.05 + 0.2, ease: "easeOut" }}
+                            transition={{
+                              duration: 0.5,
+                              delay: index * 0.05 + 0.2,
+                              ease: "easeOut",
+                            }}
                           />
                         </div>
                         <span className="text-base text-muted-foreground w-14 text-right shrink-0 tabular-nums">

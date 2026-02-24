@@ -65,8 +65,10 @@ export default async function PublicChangelogPage({
 
       {/* Header */}
       <header className="bg-card border-b">
-        <div className="max-w-5xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">{project.name}</h1>
+        <div className="max-w-5xl mx-auto px-4 pt-24 pb-16 sm:py-16 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">
+            {project.name}
+          </h1>
           {project.website ? (
             <a
               href={project.website}
@@ -84,11 +86,11 @@ export default async function PublicChangelogPage({
           )}
 
           {/* Subscribe + RSS row */}
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-2">
             <SubscribeForm projectId={project.id} />
             <Link
               href={`/changelog/${slug}/rss`}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors"
               title="RSS Feed"
             >
               <Rss className="h-5 w-5" />

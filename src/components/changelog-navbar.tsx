@@ -61,16 +61,16 @@ export default function ChangelogNavbar() {
   };
 
   return (
-    <div ref={containerRef} className="fixed top-0 left-0 z-50">
+    <div ref={containerRef} className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg sm:bg-transparent sm:backdrop-blur-none sm:right-auto">
       {/* Clivy logo */}
-      <div className="p-6 pb-4">
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex items-center gap-2.5 text-3xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
-        >
-          <Menu className="h-6 w-6" />
-          Clivy
-        </button>
+      <div className="p-4 sm:p-6 sm:pb-4">
+      <button
+  onClick={() => setOpen(!open)}
+  className="flex items-center gap-2 text-xl sm:text-3xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
+>
+  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+  Clivy
+</button>
       </div>
 
       {/* Small dropdown with nav links */}

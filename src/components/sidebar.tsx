@@ -27,7 +27,7 @@ export default function Sidebar() {
   const initial = session?.user?.name?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 border-r bg-card flex flex-col">
+    <aside className="hidden md:flex fixed top-0 left-0 h-screen w-64 border-r bg-card flex-col">
       {/* Logo */}
       <div className="px-7 py-6 border-b">
         <Link href="/dashboard" className="text-2xl font-bold tracking-tight">

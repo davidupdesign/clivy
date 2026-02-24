@@ -48,7 +48,7 @@ function StickyEntryHeader({ date, version, title }: { date: string; version: st
     <>
       {/* invisible sentinel — when this scrolls out of view, the header is "stuck" */}
       <div ref={sentinelRef} className="absolute top-0 h-px w-full" />
-      <div className={`md:col-span-3 sticky top-0 ${isStuck ? "z-20" : "z-10"}`}>
+      <div className={`md:col-span-3 relative md:sticky md:top-0 ${isStuck ? "md:z-40" : "md:z-10"}`}>
         {/* solid background so content doesn't show through */}
         <div className="absolute inset-0 bg-background" />
         {/* full-width bottom shadow — only visible when stuck */}
@@ -179,7 +179,7 @@ export default function ChangelogTimeline({ dateGroups }: { dateGroups: DateGrou
 
                     {/* header image — slightly narrower than the sticky header */}
                     {entry.headerImage && (
-                      <div className="w-[95%] overflow-hidden rounded-4xl mb-6 shadow-sm" style={{ aspectRatio: "5/2" }}>
+                      <div className="w-full sm:w-[95%] overflow-hidden rounded-2xl sm:rounded-4xl mb-6 shadow-sm" style={{ aspectRatio: "5/2" }}>
                         <img
                           src={entry.headerImage}
                           alt={`${entry.title} header`}

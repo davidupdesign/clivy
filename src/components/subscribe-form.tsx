@@ -46,7 +46,7 @@ export default function SubscribeForm({ projectId }: { projectId: string }) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="flex gap-3 max-w-lg">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-sm sm:max-w-lg">
         <Input
           type="email"
           placeholder="you@example.com"

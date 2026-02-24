@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Sidebar from "@/components/sidebar";
 
+import MobileSidebar from "@/components/mobile-sidebar";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -16,10 +18,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 ml-64 p-10">
+      <MobileSidebar />
+      <main className="flex-1 md:ml-64 p-5 pt-19 md:p-10 md:pt-10">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
     </div>
