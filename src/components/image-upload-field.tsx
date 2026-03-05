@@ -189,7 +189,7 @@ export default function ImageUploadField({
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           {/* File upload */}
           <div className="flex items-center gap-3">
             <label className="cursor-pointer">
@@ -200,12 +200,12 @@ export default function ImageUploadField({
                 className="sr-only"
                 onChange={handleFileSelect}
               />
-              <span className="inline-flex items-center gap-2 px-5 py-3 border rounded-lg text-lg hover:bg-muted transition-colors">
-                Upload image
-              </span>
+              <span className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-muted transition-colors">
+  Upload image
+</span>
             </label>
-            <span className="text-lg text-muted-foreground">Max 10MB</span>
-          </div>
+            <span className="text-sm text-muted-foreground">Max 10MB</span>
+            </div>
 
           {/* URL input */}
           <div className="flex gap-3 items-center">
@@ -213,16 +213,16 @@ export default function ImageUploadField({
               placeholder="Or paste an image URL"
               value={imageUrlInput}
               onChange={(e) => setImageUrlInput(e.target.value)}
-              className="flex-1 h-13 text-lg"
-            />
+              className="flex-1 h-10 text-sm"
+              />
             <Button
               type="button"
               variant="outline"
               size="lg"
               onClick={handleUrlConfirm}
               disabled={!imageUrlInput.trim() || loadingUrl}
-              className="h-13 px-8 text-base"
-            >
+              className="h-10 px-5 text-sm"
+              >
               {loadingUrl ? "Loading..." : "Use URL"}
             </Button>
           </div>

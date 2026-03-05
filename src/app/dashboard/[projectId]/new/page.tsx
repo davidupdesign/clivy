@@ -165,21 +165,23 @@ export default function NewEntryPage({
     >
       <Link
         href={`/dashboard/${projectId}`}
-        className="inline-flex items-center gap-2 text-lg text-muted-foreground hover:text-foreground transition-colors mb-4"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground
+ hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="h-5 w-5" />
         Back to project
       </Link>
 
-      <h1 className="text-4xl font-bold tracking-tight mb-10">
-        New Changelog Entry
+      <h1 className="text-2xl font-bold tracking-tight mb-8">
+      New Changelog Entry
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-10">
         {/* title + version — title gets more space */}
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-5">
           <div className="space-y-3">
-            <Label htmlFor="title" className="text-2xl font-medium">
+            <Label htmlFor="title" className="text-base font-medium"
+            >
               Title
             </Label>
             <Input
@@ -188,11 +190,12 @@ export default function NewEntryPage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="h-13 text-lg"
-            />
+              className="h-10 text-sm"
+              />
           </div>
           <div className="space-y-3">
-            <Label htmlFor="version" className="text-2xl font-medium">
+            <Label htmlFor="version" className="text-base font-medium"
+            >
               Version
             </Label>
             <Input
@@ -201,8 +204,8 @@ export default function NewEntryPage({
               value={version}
               onChange={(e) => setVersion(e.target.value)}
               required
-              className="h-13 text-lg"
-            />
+              className="h-10 text-sm"
+              />
             {previousVersion && (
               <p className="text-sm text-muted-foreground">
                 Previous:{" "}
@@ -214,7 +217,8 @@ export default function NewEntryPage({
 
         {/* tags section */}
         <div className="space-y-4">
-          <Label className="text-2xl font-medium">Tags</Label>
+          <Label className="text-base font-medium"
+          >Tags</Label>
 
           {/* existing tags — click to toggle, hover to show delete */}
           {availableTags.length > 0 && (
@@ -224,7 +228,8 @@ export default function NewEntryPage({
                   <button
                     type="button"
                     onClick={() => toggleTag(tag.id)}
-                    className={`text-base font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer uppercase ${
+                    className={`text-sm font-bold px-3 py-1 rounded-full
+ transition-all cursor-pointer uppercase ${
                       selectedTagIds.includes(tag.id)
                         ? "ring-2 ring-offset-2 ring-current"
                         : "opacity-70 hover:opacity-90"
@@ -239,7 +244,7 @@ export default function NewEntryPage({
                   <button
                     type="button"
                     onClick={() => handleDeleteTag(tag.id)}
-                    className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-foreground/80 text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-foreground"
+                    className="absolute -top-1.5 -right-1.5 size-4 rounded-full bg-foreground/80 text-background flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-foreground"
                   >
                     <X className="size-3" />
                   </button>
@@ -255,8 +260,8 @@ export default function NewEntryPage({
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
               maxLength={16}
-              className="w-60 h-12 text-base"
-            />
+              className="w-52 h-9 text-sm"
+              />
             {/* preset color swatches */}
             <div className="flex flex-wrap gap-2">
               {TAG_COLORS.map((c) => (
@@ -264,7 +269,7 @@ export default function NewEntryPage({
                   key={c.value}
                   type="button"
                   onClick={() => setNewTagColor(c.value)}
-                  className="w-9 h-9 rounded-full cursor-pointer transition-all border-2"
+                  className="size-6 rounded-full cursor-pointer transition-all border-2"
                   style={{
                     backgroundColor: c.value,
                     borderColor:
@@ -284,8 +289,8 @@ export default function NewEntryPage({
               size="lg"
               onClick={handleCreateTag}
               disabled={!newTagName.trim()}
-              className="h-12 px-6 text-base gap-1.5"
-            >
+              className="h-9 px-4 text-sm gap-1.5"
+              >
               <Plus className="h-4 w-4" />
               Add
             </Button>
@@ -294,7 +299,8 @@ export default function NewEntryPage({
 
         {/* header image */}
         <div className="space-y-4">
-          <Label className="text-2xl font-medium">
+          <Label className="text-base font-medium"
+          >
             Header Image (optional)
           </Label>
           <ImageUploadField onImageChange={(url) => setHeaderImage(url)} />
@@ -307,7 +313,7 @@ export default function NewEntryPage({
               <button
                 type="button"
                 onClick={() => setEditorTab("write")}
-                className={`px-4 py-2 rounded-full transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
                   editorTab === "write"
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
@@ -315,8 +321,8 @@ export default function NewEntryPage({
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -331,7 +337,7 @@ export default function NewEntryPage({
               <button
                 type="button"
                 onClick={() => setEditorTab("preview")}
-                className={`px-4 py-2 rounded-full transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
                   editorTab === "preview"
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
@@ -339,8 +345,8 @@ export default function NewEntryPage({
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -353,7 +359,8 @@ export default function NewEntryPage({
                 </svg>
               </button>
             </div>
-            <span className="text-xl font-medium text-muted-foreground">
+            <span className="text-base font-medium text-muted-foreground"
+            >
               {editorTab === "write" ? "Content (Markdown)" : "Preview"}
             </span>
           </div>
@@ -362,7 +369,7 @@ export default function NewEntryPage({
               <textarea
                 id="body"
                 data-lenis-prevent
-                className="w-full h-[500px] min-h-[200px] p-5 bg-background text-lg font-mono resize-y overflow-y-auto focus:outline-none rounded-xl"
+                className="w-full h-[450px] min-h-[200px] p-4 bg-background text-sm font-mono resize-y overflow-y-auto focus:outline-none rounded-xl"
                 placeholder="Write your changelog in markdown..."
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -371,12 +378,14 @@ export default function NewEntryPage({
             ) : (
               <div
                 data-lenis-prevent
-                className="h-[500px] min-h-[200px] p-5 prose prose-lg max-w-none overflow-y-auto resize-y"
+                className="h-[450px] min-h-[200px] p-4 prose prose-sm
+ max-w-none overflow-y-auto resize-y"
               >
                 {body ? (
                   <ReactMarkdown>{body}</ReactMarkdown>
                 ) : (
-                  <p className="text-muted-foreground text-lg">
+                  <p className="text-muted-foreground text-sm"
+>
                     Nothing to preview yet...
                   </p>
                 )}
@@ -385,7 +394,8 @@ export default function NewEntryPage({
           </div>
         </div>
 
-        {error && <p className="text-lg text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-500"
+          >{error}</p>}
 
         {/* buttons */}
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
@@ -394,8 +404,8 @@ export default function NewEntryPage({
             size="lg"
             disabled={loading}
             onClick={() => setStatus("draft")}
-            className="h-12 px-8 text-base"
-          >
+            className="h-10 px-5 text-sm"
+            >
             {loading ? "Saving..." : "Save as Draft"}
           </Button>
           <Button
@@ -404,8 +414,8 @@ export default function NewEntryPage({
             size="lg"
             disabled={loading}
             onClick={() => setStatus("published")}
-            className="h-12 px-8 text-base"
-          >
+            className="h-10 px-5 text-sm"
+            >
             Publish Now
           </Button>
 
@@ -417,8 +427,8 @@ export default function NewEntryPage({
               variant="ghost"
               size="lg"
               onClick={() => setShowSchedule(true)}
-              className="h-12 px-6 text-base gap-2 text-muted-foreground"
-            >
+              className="h-10 px-4 text-sm gap-2 text-muted-foreground"
+              >
               <Calendar className="h-5 w-5" />
               Schedule
             </Button>
@@ -430,16 +440,16 @@ export default function NewEntryPage({
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="w-auto h-12 text-base"
-              />
+                className="w-auto h-10 text-sm"
+                />
               <Button
                 type="submit"
                 variant="outline"
                 size="lg"
                 disabled={loading || !scheduledAt}
                 onClick={() => setStatus("scheduled")}
-                className="h-12 px-8 text-base"
-              >
+                className="h-10 px-5 text-sm"
+                >
                 Schedule
               </Button>
               <Button
@@ -450,8 +460,8 @@ export default function NewEntryPage({
                   setShowSchedule(false);
                   setScheduledAt("");
                 }}
-                className="h-12 text-base text-muted-foreground"
-              >
+                className="h-10 text-sm text-muted-foreground"
+                >
                 Cancel
               </Button>
             </div>

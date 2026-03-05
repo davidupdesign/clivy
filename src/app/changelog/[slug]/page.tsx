@@ -66,7 +66,8 @@ export default async function PublicChangelogPage({
       {/* Header */}
       <header className="bg-card border-b">
         <div className="max-w-5xl mx-auto px-4 pt-24 pb-16 sm:py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+
             {project.name}
           </h1>
           {project.website ? (
@@ -74,13 +75,15 @@ export default async function PublicChangelogPage({
               href={project.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-lg text-muted-foreground hover:text-foreground transition-colors mb-8"
+              className="inline-flex items-center gap-1.5 text-base text-muted-foreground
+ hover:text-foreground transition-colors mb-8"
             >
               {project.website.replace(/^https?:\/\//, "")}
               <ExternalLink className="h-4 w-4" />
             </a>
           ) : (
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-base text-muted-foreground mb-8"
+>
               Product updates and improvements
             </p>
           )}
@@ -102,7 +105,8 @@ export default async function PublicChangelogPage({
       {/* Timeline */}
       <main className="max-w-5xl mx-auto px-4 py-14">
         {project.entries.length === 0 ? (
-          <p className="text-center text-lg text-muted-foreground py-12">
+          <p className="text-center text-base text-muted-foreground py-12"
+>
             No updates yet. Check back soon!
           </p>
         ) : (
