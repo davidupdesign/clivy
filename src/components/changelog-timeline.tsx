@@ -177,7 +177,7 @@ export default function ChangelogTimeline({
                   </div>
 
                   {/* right column: entry content (tags, image, body, reactions) */}
-                  <div className="pt-2 pb-10 min-w-0 md:pl-8">
+                  <div className="pt-1 pb-10 min-w-0 md:pl-8">
                     {/* tags */}
                     {entry.tags.length > 0 && (
                       <div className="flex gap-2.5 mb-5">
