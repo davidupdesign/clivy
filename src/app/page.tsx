@@ -193,7 +193,7 @@ export default function LandingPage() {
             }}
           >
             <div className="inline-flex items-center gap-2 border border-zinc-200 dark:border-zinc-700 rounded-full px-4 py-1.5 mb-8 text-sm text-zinc-500">
-              <span className="w-2 h-2 rounded-full bg-[#84c1ff] dark:bg-zinc-100 animate-pulse" />
+              <span className="w-4.5 h-2.5 rounded-md bg-[#84c1ff] dark:bg-zinc-100 " />
               Best open source changelog platform
             </div>
           </div>
@@ -259,10 +259,10 @@ export default function LandingPage() {
               <img
                 src="/Rapid Stroke - UpRight - 58@2x.png"
                 alt=""
-                className="hidden md:block absolute -bottom-17 lg:-bottom-15 right-[16%] scale-x-[-1] size-26 -rotate-16 lg:-rotate-20 pointer-events-none select-none "
+                className=" sm:block absolute -bottom-21 xs: lg:-bottom-15 right-43 sm:right-[9%] md:right-[16%] scale-x-[-1] size-26 rotate-18 sm:-rotate-16 lg:-rotate-20 pointer-events-none select-none "
               />
               <h2
-                className={`hidden md:block absolute text-[#2196F3] -bottom-2.5 lg:bottom-0 right-[10%] font-black text-3xl rotate-8 pointer-events-none ${caveat.className}  sm:max-w-30 lg:max-w-full text-shadow-2xs`}
+                className={` sm:block absolute text-[#2196F3] xs:rotate-0 -bottom-17 right-10 sm:-bottom-3 lg:bottom-2 sm:right-[0%] md:right-[10%] font-black text-3xl sm:rotate-8 pointer-events-none ${caveat.className}  sm:max-w-30 lg:max-w-full text-shadow-2xs`}
                 style={{ animationDuration: "2s" }}
               >
                 Check It Out!
