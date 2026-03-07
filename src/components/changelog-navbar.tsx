@@ -11,8 +11,18 @@ import { toast } from "sonner";
 
 const dropdownVariants = {
   hidden: { opacity: 0, scale: 0.95, y: -4 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
-  exit: { opacity: 0, scale: 0.95, y: -4, transition: { duration: 0.15, ease: "easeIn" } },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.2, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    y: -4,
+    transition: { duration: 0.15, ease: "easeIn" },
+  },
 };
 
 const itemVariants = {
@@ -34,7 +44,10 @@ export default function ChangelogNavbar() {
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -61,16 +74,19 @@ export default function ChangelogNavbar() {
   };
 
   return (
-    <div ref={containerRef} className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg sm:bg-transparent sm:backdrop-blur-none sm:right-auto">
+    <div
+      ref={containerRef}
+      className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg md:bg-transparent md:backdrop-blur-none md:right-auto md:border-none border-b border-border/50"
+    >
       {/* Clivy logo */}
-      <div className="p-4 sm:p-6 sm:pb-4">
-      <button
-  onClick={() => setOpen(!open)}
-  className="flex items-center gap-2 text-xl sm:text-3xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
->
-  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
-  Clivy
-</button>
+      <div className="p-4 md:p-6 md:pb-4">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-2 text-xl md:text-3xl font-bold hover:opacity-70 transition-opacity cursor-pointer"
+        >
+          <Menu className="h-5 w-5 md:stroke-3 xl:stroke-2  md:h-6 md:w-6 my-1.5" />
+          <span className="md:hidden xl:inline">Clivy</span>
+        </button>
       </div>
 
       {/* Small dropdown with nav links */}

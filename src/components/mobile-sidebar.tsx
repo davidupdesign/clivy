@@ -44,7 +44,7 @@ useEffect(() => {
 
   return (
     <>
-      {/* Top bar — visible only on mobile (md:hidden) */}
+      {/* Top bar — visible only on mobile */}
       <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between h-14 px-4 border-b bg-card md:hidden">
         <Link href="/dashboard" className="text-xl font-bold tracking-tight">
           Clivy

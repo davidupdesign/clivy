@@ -103,7 +103,7 @@ export default async function PublicChangelogPage({
       </header>
 
       {/* Timeline */}
-      <main className="max-w-5xl mx-auto px-4 py-14">
+      <main className="max-w-5xl mx-auto px-8 py-14">
         {project.entries.length === 0 ? (
           <p className="text-center text-base text-muted-foreground py-12"
 >

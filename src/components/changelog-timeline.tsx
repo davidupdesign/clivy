@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 import Reactions from "@/components/reactions";
 import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
 // pagination — how many entries to show initially and per "show more" click
 const INITIAL_COUNT = 5;
@@ -238,9 +239,11 @@ export default function ChangelogTimeline({
           <Button
             variant="outline"
             size="lg"
+            className="text-md h-12 font-bold border-2 cursor-pointer transition-all duration-200"
             onClick={() => setVisibleCount((c) => c + LOAD_MORE_COUNT)}
           >
-            Show more
+            Show More
+            <ChevronDown className="size-5 mt-0.5 stroke-3" />
           </Button>
         </motion.div>
       )}
