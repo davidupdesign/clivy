@@ -3,7 +3,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Inter } from "next/font/google";
+import { Inter, Caveat } from "next/font/google";
+import Image from "next/image";
+
+const caveat = Caveat({ subsets: ["latin"] });
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -130,8 +133,14 @@ const INCLUDES = [
   ["Header Images", "Upload or paste a URL. Auto-cropped to 5:2 ratio."],
   ["Version Tracking", "Semantic versioning with previous version hints."],
   ["RSS Feed", "Let users subscribe via their favorite RSS reader."],
-  ["Subscriber Management", "View, filter, and remove subscribers per project."],
-  ["Scheduled Cron Jobs", "Vercel cron publishes scheduled entries automatically."],
+  [
+    "Subscriber Management",
+    "View, filter, and remove subscribers per project.",
+  ],
+  [
+    "Scheduled Cron Jobs",
+    "Vercel cron publishes scheduled entries automatically.",
+  ],
 ];
 
 // ─── main page ───
@@ -199,7 +208,8 @@ export default function LandingPage() {
             Keep your users
             <br />
             <span className="bg-linear-to-r from-zinc-900 via-zinc-600 to-zinc-400 dark:from-zinc-100 dark:via-zinc-400 dark:to-zinc-600 bg-clip-text text-transparent">
-              in the loop</span>
+              in the loop
+            </span>
           </h1>
           <p
             style={{
@@ -219,11 +229,11 @@ export default function LandingPage() {
               transform: heroVisible ? "translateY(0)" : "translateY(30px)",
               transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.3s",
             }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center relative"
           >
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-base font-semibold px-8 py-3.5 rounded-xl hover:opacity-90 transition-opacity"
+              className="inline-flex items-center justify-center gap-2 hover:gap-2 transition-all duration-200 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-base font-semibold px-8 py-3.5 rounded-xl hover:opacity-80"
             >
               Start for free
               <svg
@@ -241,10 +251,23 @@ export default function LandingPage() {
             <Link
               href="/changelog/clivy"
               target="_blank"
-              className="inline-flex items-center justify-center gap-2 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-base font-medium px-8 py-3.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+              className="inline-flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-base font-medium px-8 py-3.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
             >
               View live demo
             </Link>
+            <div className="-z-10">
+              <img
+                src="/Rapid Stroke - UpRight - 58@2x.png"
+                alt=""
+                className="hidden md:block absolute -bottom-17 lg:-bottom-15 right-[16%] scale-x-[-1] size-26 -rotate-16 lg:-rotate-20 pointer-events-none select-none "
+              />
+              <h2
+                className={`hidden md:block absolute text-[#2196F3] -bottom-2.5 lg:bottom-0 right-[10%] font-black text-3xl rotate-8 pointer-events-none ${caveat.className}  sm:max-w-30 lg:max-w-full text-shadow-2xs`}
+                style={{ animationDuration: "2s" }}
+              >
+                Check It Out!
+              </h2>
+            </div>
           </div>
         </div>
       </section>
