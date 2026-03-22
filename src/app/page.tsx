@@ -192,7 +192,7 @@ export default function LandingPage() {
               transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0s",
             }}
           >
-            <div className="inline-flex items-center gap-2 border border-zinc-200 dark:border-zinc-700 rounded-full px-4 py-1.5 mb-8 text-sm text-zinc-500">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8 text-sm text-zinc-500">
               <span className="w-4.5 h-2.5 rounded-md bg-[#84c1ff] dark:bg-zinc-100 " />
               Best open source changelog platform
             </div>
